@@ -60,14 +60,14 @@ def process_day(day_file: str) -> pl.LazyFrame:
         .with_columns(
             pl.col("NAVSTATUSCODE")
             .arr.contains(NAV_STATUS_CODES["moored"])
-            .alias("moored_event"),
+            .alias("is_moored_event"),
             pl.col("NAVSTATUSCODE")
             .arr.contains(NAV_STATUS_CODES["anchored"])
-            .alias("anchored_event"),
+            .alias("is_anchored_event"),
         )
         .filter(
-            (pl.col("moored_event"))  # moored event
-            | (pl.col("anchored_event"))  # anchored event
+            (pl.col("is_moored_event"))  # moored event
+            | (pl.col("is_anchored_event"))  # anchored event
             | (pl.col("SOG") <= SPEED_OVER_GROUND_THRESHOLD)  # no speed
             | (
                 pl.col("number_of_h3_cells") == NUMBER_OF_H3_CELLS_THRESHOLD
@@ -120,16 +120,16 @@ def process_day(day_file: str) -> pl.LazyFrame:
             .otherwise(False)
             .cast(pl.UInt8)
             .alias("towing_event"),
-            pl.when(pl.col("moored_event"))
+            pl.when(pl.col("is_moored_event"))
             .then(True)
             .otherwise(False)
             .cast(pl.UInt8)
-            .alias("moored_event"),
-            pl.when(pl.col("anchored_event"))
+            .alias("is_moored_event"),
+            pl.when(pl.col("is_anchored_event"))
             .then(True)
             .otherwise(False)
             .cast(pl.UInt8)
-            .alias("anchored_event"),
+            .alias("is_anchored_event"),
         )
         .drop(
             [

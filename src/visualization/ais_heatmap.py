@@ -23,11 +23,11 @@ def main():
         queries.append(
             pl.scan_parquet(
                 day_file,
-            ).select(
-                ["MMSI", "h3_cell_rough", "LATITUDE", "LONGITUDE"]
-            ).filter(
-                (pl.col("h3_cell_rough") != 0) & (pl.col("is_class_a") == False)
-            ).groupby("h3_cell_rough").agg(
+            )
+            .select(["MMSI", "h3_cell_rough", "LATITUDE", "LONGITUDE"])
+            .filter((pl.col("h3_cell_rough") != 0) & (not pl.col("is_class_a")))
+            .groupby("h3_cell_rough")
+            .agg(
                 pl.col("MMSI").n_unique().alias("MMSI_COUNT"),
             )
         )
@@ -36,15 +36,19 @@ def main():
     df = pl.concat(queries)
 
     df = df.with_columns(
-        pl.col(["h3_cell_rough",]).apply(lambda x: compute_h3_cell((x, 5))).alias('h3_cell_rough'),
+        pl.col(
+            [
+                "h3_cell_rough",
+            ]
+        )
+        .apply(lambda x: compute_h3_cell((x, 5)))
+        .alias("h3_cell_rough"),
     )
 
-    df = df.groupby("h3_cell_rough").agg(
-        pl.col("MMSI_COUNT").sum()
-    )
+    df = df.groupby("h3_cell_rough").agg(pl.col("MMSI_COUNT").sum())
 
     df = df.with_columns(
-        pl.col("h3_cell_rough").apply(lambda x: f"{x:0x}").alias('h3_cell_rough'),
+        pl.col("h3_cell_rough").apply(lambda x: f"{x:0x}").alias("h3_cell_rough"),
     )
 
     df.write_csv(OUTPUT_FILE)
