@@ -16,7 +16,7 @@ def get_messages(mmsi: str) -> pd.DataFrame:
     # df = pd.read_parquet(os.path.join(INPUT_DIRECTORY, f"{DATE}.parquet"))
     df = df.to_pandas()
 
-    return df[df["MMSI"]==MMSI_WANTED]
+    return df[df["MMSI"] == MMSI_WANTED]
 
 
 def plot_column(column: str, df: pd.DataFrame, name: str, label=""):
@@ -25,9 +25,9 @@ def plot_column(column: str, df: pd.DataFrame, name: str, label=""):
 
     sns.lineplot(x="TIMESTAMPUTC", y=column, markers=True, data=df, ax=ax)
     plt.ylabel(label)
-    
+
     # draw vessel in port marker
-    plt.axvspan("2020-01-18 20:24:00", "2020-01-19 18:59:00", facecolor='r', alpha=0.2)
+    plt.axvspan("2020-01-18 20:24:00", "2020-01-19 18:59:00", facecolor="r", alpha=0.2)
 
     plt.tight_layout()
 
