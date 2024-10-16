@@ -1,0 +1,17 @@
+[package]
+name = "polars_h3"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "polars_h3"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.18", features = ["extension-module"] }
+pyo3-polars = { version = "*", path = "../pyo3-polars" }
+polars = { version = "*", features = ["fmt"] }
+rayon = "1.6"
+h3o = "0.3.1"
+polars-core = "0.28.0"
