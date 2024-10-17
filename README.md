@@ -1,3 +1,3 @@
-![ddpi logo](static/images/FullLogo_Transparent.png)
+![ddpi logo](static/images/FullLogo.jpg)
 
 # ddpi
