@@ -84,7 +84,7 @@ CLASS_B_MESSAGES = {
 
 
 def simplify_df(df: pl.DataFrame) -> pl.DataFrame:
-    return df.groupby_dynamic("TIMESTAMPUTC", by="MMSI", every="1m").agg(
+    return df.group_by_dynamic("TIMESTAMPUTC", by="MMSI", every="1m").agg(
         pl.col("SOG").mean(),
         pl.col("COG").mean(),
         pl.col("ROT").mean(),
@@ -129,61 +129,52 @@ def compute_h3_cell(values: Tuple[float]) -> int:
         pass
 
 
-def simplifiy(day: str):
-    print(day)
-    return 
-    out_path = f"{os.path.join(OUTPUT_DIRECTORY, os.path.basename(day))}.parquet"
+def simplifiy(day: str, output_directory: str):
+    out_path = f"{os.path.join(output_directory, os.path.basename(day))}.parquet"
     if not os.path.isfile(out_path):
-        try:
-            df = pl.read_parquet(f"{day}/*type_cast.parquet", columns=AIS_COLUMNS)
+        df = pl.read_parquet(f"{day}/*", columns=AIS_COLUMNS)
 
-            # filter and combine class a and class b messages
-            class_a_df = class_messages(df, CLASS_A_MESSAGES)
-            class_b_df = class_messages(df, CLASS_B_MESSAGES)
+        # filter and combine class a and class b messages
+        class_a_df = class_messages(df, CLASS_A_MESSAGES)
+        class_b_df = class_messages(df, CLASS_B_MESSAGES)
 
-            df = pl.concat([class_a_df, class_b_df]).sort("TIMESTAMPUTC")
+        df = pl.concat([class_a_df, class_b_df]).sort("TIMESTAMPUTC")
 
-            # remove redundancies
-            df = simplify_df(df)
+        # remove redundancies
+        df = simplify_df(df)
 
-            df = df.filter(
-                (~pl.col("LATITUDE").is_infinite())
-                & (~pl.col("LONGITUDE").is_infinite())
-            )
+        df = df.filter(
+            (~pl.col("LATITUDE").is_infinite())
+            & (~pl.col("LONGITUDE").is_infinite())
+        )
 
-            # TODO: remove type conversion and handle this in rust
-            df = df.with_columns(
-                [
-                    pl.col("LONGITUDE").cast(pl.Float64),
-                    pl.col("LATITUDE").cast(pl.Float64),
-                ]
-            )
+        # TODO: remove type conversion and handle this in rust
+        df = df.with_columns(
+            [
+                pl.col("LONGITUDE").cast(pl.Float64),
+                pl.col("LATITUDE").cast(pl.Float64),
+            ]
+        )
 
-            # add h3 cells
-            df_h3_cell = parallel_lat_lon_to_cell(
-                df.select(["LONGITUDE", "LATITUDE"]),
-                "LATITUDE",
-                "LONGITUDE",
-                H3_RESOLUTION,
-                "h3_cell",
-            )
-            df_h3_cell_rough = parallel_lat_lon_to_cell(
-                df.select(["LONGITUDE", "LATITUDE"]),
-                "LATITUDE",
-                "LONGITUDE",
-                H3_ROUGH_RESOLUTION,
-                "h3_cell_rough",
-            )
-            df = pl.concat([df, df_h3_cell, df_h3_cell_rough], how="horizontal")
+        # add h3 cells
+        df_h3_cell = parallel_lat_lon_to_cell(
+            df.select(["LONGITUDE", "LATITUDE"]),
+            "LATITUDE",
+            "LONGITUDE",
+            H3_RESOLUTION,
+            "h3_cell",
+        )
+        df_h3_cell = df_h3_cell.drop(["LONGITUDE", "LATITUDE"])
 
-            df = df.with_columns(
-                [
-                    pl.col("LONGITUDE").cast(pl.Float32),
-                    pl.col("LATITUDE").cast(pl.Float32),
-                ]
-            )
+        df_h3_cell_rough = parallel_lat_lon_to_cell(
+            df.select(["LONGITUDE", "LATITUDE"]),
+            "LATITUDE",
+            "LONGITUDE",
+            H3_ROUGH_RESOLUTION,
+            "h3_cell_rough",
+        )
+        df_h3_cell_rough = df_h3_cell_rough.drop(["LONGITUDE", "LATITUDE"])
 
-            df.write_parquet(out_path)
-        except Exception as e:
-            print(e)
-            pass
+        df = pl.concat([df, df_h3_cell, df_h3_cell_rough], how="horizontal")
+
+        df.write_parquet(out_path)
