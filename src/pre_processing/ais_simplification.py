@@ -140,7 +140,6 @@ def simplifiy(day: str, output_directory: str):
 
         df = pl.concat([class_a_df, class_b_df]).sort("TIMESTAMPUTC")
 
-        # remove redundancies
         df = simplify_df(df)
 
         df = df.filter(
