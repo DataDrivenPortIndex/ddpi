@@ -15,27 +15,31 @@ load_dotenv()
 def get_env(name: str) -> str:
     value = os.getenv(name)
 
-    print(value)
-
     if value != "" and "XXXXX" not in value:
         return value
 
     raise MissingEnvironmentVariable(f"Enviroment variable'{name}' does not exist")
 
 
+def simplification(input_directory: str, output_directory: str):
+    for day_file in tqdm(os.listdir(input_directory)):
+        input_directory = os.path.join(input_directory, day_file)
+        ais_simplification.simplifiy(input_directory, output_directory)
+
 
 def main():
     # ais simplification
     ais_input_directory = get_env("AIS_INPUT_DIRECTORY")
+    ais_simplified_directory = get_env("AIS_SIMPLIFIED_DIRECTORY")
 
-    for day_file in tqdm(os.listdir(ais_input_directory)):
-        ais_simplification.simplifiy(day_file)
+    print("Perform AIS-Simplification:")
+    simplification(ais_input_directory, ais_simplified_directory)
 
-    # event extraction
+    print("Perform Port-Event-Extraction:")
 
+    print("Perform Port-Event-Validation:")
 
-    # event validation
-
+    print("Perform Port-Clustering:")
 
 
 if __name__ == "__main__":
