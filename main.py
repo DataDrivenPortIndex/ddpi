@@ -12,7 +12,7 @@ from src.errors.env import MissingEnvironmentVariable
 load_dotenv()
 
 
-def load_env(name: str) -> str:
+def get_env(name: str) -> str:
     value = os.getenv(name)
 
     print(value)
@@ -26,7 +26,7 @@ def load_env(name: str) -> str:
 
 def main():
     # ais simplification
-    ais_input_directory = load_env("AIS_INPUT_DIRECTORY")
+    ais_input_directory = get_env("AIS_INPUT_DIRECTORY")
 
     for day_file in tqdm(os.listdir(ais_input_directory)):
         ais_simplification.simplifiy(day_file)
@@ -36,7 +36,7 @@ def main():
 
     # event validation
 
-    
+
 
 if __name__ == "__main__":
     main()
