@@ -1,8 +1,7 @@
 import os
 import polars as pl
-import h3.api.basic_int as h3
 
-from typing import Dict, Tuple
+from typing import Dict
 from pyo3_h3 import parallel_lat_lon_to_cell
 
 H3_RESOLUTION = 11
