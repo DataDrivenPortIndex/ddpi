@@ -4,7 +4,9 @@ import os
 from tqdm import tqdm
 from dotenv import load_dotenv
 
+from src.pre_processing import ais_simplification
 from src.errors.env import MissingEnvironmentVariable
+
 
 
 load_dotenv()
@@ -15,7 +17,7 @@ def load_env(name: str) -> str:
 
     print(value)
 
-    if value != "":
+    if value != "" and "XXXXX" not in value:
         return value
 
     raise MissingEnvironmentVariable(f"Enviroment variable'{name}' does not exist")
@@ -24,11 +26,17 @@ def load_env(name: str) -> str:
 
 def main():
     # ais simplification
-
     ais_input_directory = load_env("AIS_INPUT_DIRECTORY")
 
-    for i in tqdm(os.listdir(ais_input_directory)):
-        print(i)
+    for day_file in tqdm(os.listdir(ais_input_directory)):
+        ais_simplification.simplifiy(day_file)
+
+    # event extraction
+
+
+    # event validation
+
+    
 
 if __name__ == "__main__":
     main()
