@@ -13,5 +13,6 @@ dependencies = [
     "pyo3-h3>=0.1.1",
     "python-dotenv>=1.0.1",
     "scikit-learn>=1.5.2",
+    "seaborn>=0.13.2",
     "tqdm>=4.66.6",
 ]
