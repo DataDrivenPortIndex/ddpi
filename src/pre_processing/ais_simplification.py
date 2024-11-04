@@ -122,13 +122,6 @@ def class_messages(df: pl.DataFrame, mode_config: Dict) -> pl.DataFrame:
     )
 
 
-def compute_h3_cell(values: Tuple[float]) -> int:
-    try:
-        return h3.geo_to_h3(values[0], values[1], values[2])
-    except TypeError:
-        pass
-
-
 def simplifiy(day: str, output_directory: str):
     out_path = f"{os.path.join(output_directory, os.path.basename(day))}.parquet"
     if not os.path.isfile(out_path):
