@@ -9,7 +9,7 @@ from src.errors.env import MissingEnvironmentVariable
 
 
 
-load_dotenv()
+load_dotenv(override=True)
 
 
 def get_env(name: str) -> str:
