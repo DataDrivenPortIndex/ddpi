@@ -83,7 +83,7 @@ CLASS_B_MESSAGES = {
 }
 
 
-def simplify_df(df: pl.DataFrame) -> pl.DataFrame:
+def aggregate_ais(df: pl.DataFrame) -> pl.DataFrame:
     return df.group_by_dynamic("TIMESTAMPUTC", by="MMSI", every="1m").agg(
         pl.col("SOG").mean(),
         pl.col("COG").mean(),
@@ -133,7 +133,7 @@ def simplifiy(day: str, output_directory: str):
 
         df = pl.concat([class_a_df, class_b_df]).sort("TIMESTAMPUTC")
 
-        df = simplify_df(df)
+        df = aggregate_ais(df)
 
         df = df.filter(
             (~pl.col("LATITUDE").is_infinite())
