@@ -1,5 +1,4 @@
 import os
-import sys
 import polars as pl
 import h3.api.basic_int as h3
 
@@ -130,8 +129,9 @@ def compute_h3_cell(values: Tuple[float]) -> int:
         pass
 
 
-def main(day: str):
+def simplifiy(day: str):
     print(day)
+    return 
     out_path = f"{os.path.join(OUTPUT_DIRECTORY, os.path.basename(day))}.parquet"
     if not os.path.isfile(out_path):
         try:
@@ -187,8 +187,3 @@ def main(day: str):
         except Exception as e:
             print(e)
             pass
-
-
-if __name__ == "__main__":
-    args = sys.argv
-    main(args[1])
