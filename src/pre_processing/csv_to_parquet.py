@@ -3,9 +3,8 @@ import sys
 import tarfile
 import subprocess
 import polars as pl
-import h3.api.basic_int as h3
 
-from typing import List, Tuple
+from typing import List
 
 
 H3_RESOLUTION = 11
@@ -87,13 +86,6 @@ def get_date_from_file_name(file_name: str) -> str:
     return os.path.basename(file_name).split("ais-")[1].split(".")[0]
 
 
-def compute_h3_cell(values: Tuple[float]) -> int:
-    try:
-        return h3.geo_to_h3(values[0], values[1], values[2])
-    except TypeError:
-        pass
-
-
 def directory_exists(directory_path: str) -> bool:
     return os.path.isdir(directory_path)
 
@@ -109,23 +101,6 @@ def csv_to_parquet_polars(csv_file: str):
         )
         df = df.with_columns(
             pl.col("TIMESTAMPUTC").str.strptime(pl.Datetime("ms"), fmt="%+"),
-        )
-
-        df = df.with_columns(
-            pl.struct(pl.col(["LONGITUDE", "LATITUDE"]))
-            .apply(
-                lambda x: compute_h3_cell(
-                    (x["LATITUDE"], x["LONGITUDE"], H3_RESOLUTION)
-                )
-            )
-            .alias("h3_cell"),
-            pl.struct(pl.col(["LONGITUDE", "LATITUDE"]))
-            .apply(
-                lambda x: compute_h3_cell(
-                    (x["LATITUDE"], x["LONGITUDE"], H3_ROUGH_RESOLUTION)
-                )
-            )
-            .alias("h3_cell_rough"),
         )
 
         df.write_parquet(csv_file.replace(".csv", ".parquet"))
