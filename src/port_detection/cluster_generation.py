@@ -1,23 +1,12 @@
-import numpy as np
 import pandas as pd
 import geopandas as gpd
-import shapely.geometry
 
 from shapely import geometry
-from h3.api import basic_int as h3
 from sklearn.cluster import DBSCAN
 
 
 PORT_THRESHOLD = 0.6
 ANCHORAGE_THRESHOLD = 0.6
-PORT_EVENTS_FILE = "validated_port_events.csv"
-
-
-def h3_to_geo(h3_cell: int):
-    try:
-        return h3.h3_to_geo(h3_cell)
-    except Exception:
-        return pd.NA, pd.NA
 
 
 def cluster_points(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -38,8 +27,6 @@ def get_data_from_csv(file: str) -> gpd.GeoDataFrame:
         (df["port_score"] >= PORT_THRESHOLD)
         | (df["anchorage_score"] >= ANCHORAGE_THRESHOLD)
     ]
-
-    df["LATITUDE"], df["LONGITUDE"] = np.vectorize(h3_to_geo)(df["h3_cell"])
 
     df = pd.DataFrame(
         df.values.repeat(df["number_of_unique_vessels"], axis=0), columns=df.columns
@@ -71,14 +58,10 @@ def create_port_polygon(gdf: gpd.GeoDataFrame, buffer=False) -> gpd.GeoDataFrame
     return port_gdf
 
 
-def polyfill(port_polygon: str, h3_resolution: int):
-    return h3.polyfill(
-        shapely.geometry.mapping(port_polygon), h3_resolution, geo_json_conformant=False
-    )
+def generate(port_events_file: str):
+    gdf = get_data_from_csv(port_events_file)
 
-
-def main():
-    gdf = get_data_from_csv(PORT_EVENTS_FILE)
+    print(gdf)
 
     ports_gdf = gdf[gdf["port_score"] >= PORT_THRESHOLD].copy()
     anchorage_gdf = gdf[gdf["anchorage_score"] >= ANCHORAGE_THRESHOLD].copy()
@@ -105,7 +88,3 @@ def main():
     ddpi_gdf.index.name = "id"
 
     ddpi_gdf.to_csv("ddpi.csv")
-
-
-if __name__ == "__main__":
-    main()
