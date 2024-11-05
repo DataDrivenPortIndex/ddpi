@@ -1,5 +1,3 @@
-import glob
-import tqdm
 import polars as pl
 
 
@@ -13,9 +11,7 @@ TOWING_VESSEL_TYPES = [52, 53]
 DESTINATION_COUNT_THRESHOLD = 2
 MINIMUN_NUMBER_OF_MESSAGES = 30
 NUMBER_OF_H3_CELLS_THRESHOLD = 1
-OUTPUT_PATH = "data/port_events"
 SPEED_OVER_GROUND_THRESHOLD = 0.2
-INPUT_PATH = "data/simplified_ais"
 YEARS_TO_PROCESS = [2020, 2021, 2022]
 NAV_STATUS_CODES = {"moored": 5, "anchored": 1}
 
@@ -147,16 +143,3 @@ def process_day(day_file: str) -> pl.LazyFrame:
         )
     )
 
-
-def main():
-    for year in YEARS_TO_PROCESS:
-        dfs = []
-        for file in tqdm.tqdm(glob.glob(f"{INPUT_PATH}/{year}*.parquet")):
-            lazy_df = process_day(file)
-            dfs.append(lazy_df.collect())
-
-        pl.concat(dfs).write_parquet(f"port_events{year}.parquet")
-
-
-if __name__ == "__main__":
-    main()
