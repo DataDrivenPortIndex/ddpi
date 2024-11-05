@@ -3,7 +3,6 @@ import sys
 import tarfile
 import pyarrow as pa
 
-from pyarrow import csv
 from typing import List
 
 
@@ -69,10 +68,6 @@ def unpack_tar_file(file: str, day_directory: str) -> List[str]:
                 t.extract(member, day_directory)
 
         return [os.path.join(day_directory, i) for i in os.listdir(day_directory)]
-
-
-def process_csv_file(csv_files: str):
-    csv_options = csv.ConvertOptions(include_columns=COLUMNS, column_types=COLUMN_TYPES)
 
 
 def main(tar_file: str):
