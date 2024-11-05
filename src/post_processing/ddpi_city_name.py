@@ -16,9 +16,10 @@ def build_wpi_distance_dict(poi_gdf):
     wpi_id = poi_gdf["World Port Index Number"].to_list()
     wpi_name = poi_gdf["Main Port Name"].to_list()
     distance = poi_gdf["distance"].to_list()
-    
+
     return [
-        {"id": wpi_id[i], "name": wpi_name[i], "distance": distance[i]} for i in range(len(wpi_id))
+        {"id": wpi_id[i], "name": wpi_name[i], "distance": distance[i]}
+        for i in range(len(wpi_id))
     ]
 
 
@@ -26,7 +27,7 @@ def build_city_distance_dict(poi_gdf):
     poi_gdf = poi_gdf.drop_duplicates(subset=["name"])
     city_name = poi_gdf["name"].to_list()
     distance = poi_gdf["distance"].to_list()
-    
+
     return [
         {"name": city_name[i], "distance": distance[i]} for i in range(len(city_name))
     ]
@@ -39,11 +40,15 @@ def calculate_poi_distance(port_point, poi_gdf):
 
     for point in split_port_polygon_into_n_sepments(port_point, 5):
         tmp_poi_gdf = poi_gdf.copy()
-        tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(point.y, point.x, poi_points)
+        tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(
+            point.y, point.x, poi_points
+        )
 
         # HACK!!!
         if math.isnan(tmp_poi_gdf.iloc[0]["distance"]):
-            tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(point.x, point.y, [(point[1], point[0]) for point in poi_points])
+            tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(
+                point.x, point.y, [(point[1], point[0]) for point in poi_points]
+            )
 
         tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_BUFFER]
 
@@ -72,12 +77,15 @@ def reduce_poi_gdf(poi_gdf, ddpi_gdf):
 
     return pd.concat([poi_gdf, negative_gdf]).drop_duplicates(keep=False)
 
+
 def main():
     ddpi_gdf = gpd.read_file(DDPI_FILE)
     # ddpi_gdf = ddpi_gdf[ddpi_gdf["id"]==1656]
 
     buffered_ddpi_gdf = ddpi_gdf.copy()
-    buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(DDPI_BUFFER / 111111)
+    buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(
+        DDPI_BUFFER / 111111
+    )
 
     # read wpi-file and reduce
     wpi_gdf = gpd.read_file(WPI_FILE)
@@ -85,11 +93,19 @@ def main():
     wpi_gdf = reduce_poi_gdf(wpi_gdf, buffered_ddpi_gdf)
 
     # read city-file and reduce
-    cities_gdf = gpd.read_file(CITY_FILE) 
+    cities_gdf = gpd.read_file(CITY_FILE)
     cities_gdf = reduce_poi_gdf(cities_gdf, buffered_ddpi_gdf)
 
-    ddpi_gdf["wpi"] = ddpi_gdf.apply(lambda x: build_wpi_distance_dict(calculate_poi_distance(x.geometry, wpi_gdf)), axis=1)
-    ddpi_gdf["city"] = ddpi_gdf.apply(lambda x: build_city_distance_dict(calculate_poi_distance(x.geometry, cities_gdf)), axis=1)
+    ddpi_gdf["wpi"] = ddpi_gdf.apply(
+        lambda x: build_wpi_distance_dict(calculate_poi_distance(x.geometry, wpi_gdf)),
+        axis=1,
+    )
+    ddpi_gdf["city"] = ddpi_gdf.apply(
+        lambda x: build_city_distance_dict(
+            calculate_poi_distance(x.geometry, cities_gdf)
+        ),
+        axis=1,
+    )
 
     with open("test__.geojson", "w") as file:
         file.write(ddpi_gdf.to_json())

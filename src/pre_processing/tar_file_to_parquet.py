@@ -12,13 +12,45 @@ NUMBER_OF_WORKERS = 8
 H3_ROUGH_RESOLUTION = 8
 ZIPPED_FILES_DIRECTORY = "/media/pbusenius/BigData/AIS/2020"
 UNZIPPED_FILES_DIRECTORY = "/media/pbusenius/BigData/AIS/2020"
-COLUMNS = ["MMSI", "IMO", "TIMESTAMPUTC", "LONGITUDE", "LATITUDE", "SHIPANDCARGOTYPECODE",
-           "SIZEA", "SIZEB", "SIZEC", "SIZED", "NAVSTATUSCODE", "COG", "SOG", "TRUEHEADING", 
-           "MAXDRAUGHT", "ROT", "MESSAGEID", "DESTINATION"]
-COLUMN_TYPES = {"MMSI": pa.uint32(), "IMO": pa.uint32(), "LONGITUDE": pa.float32(), "LATITUDE": pa.float32(),
-                "SHIPANDCARGOTYPECODE": pa.uint16(), "SIZEA": pa.uint16(), "SIZEB": pa.uint16(), "SIZEC": pa.uint16(), "SIZED": pa.uint16(),
-                "NAVSTATUSCODE": pa.uint8(), "COG": pa.float32(), "SOG": pa.float32(), "TRUEHEADING": pa.uint16(),
-                "MAXDRAUGHT": pa.float32(), "ROT": pa.uint8(), "MESSAGEID": pa.uint8(), "DESTINATION": pa.string()}
+COLUMNS = [
+    "MMSI",
+    "IMO",
+    "TIMESTAMPUTC",
+    "LONGITUDE",
+    "LATITUDE",
+    "SHIPANDCARGOTYPECODE",
+    "SIZEA",
+    "SIZEB",
+    "SIZEC",
+    "SIZED",
+    "NAVSTATUSCODE",
+    "COG",
+    "SOG",
+    "TRUEHEADING",
+    "MAXDRAUGHT",
+    "ROT",
+    "MESSAGEID",
+    "DESTINATION",
+]
+COLUMN_TYPES = {
+    "MMSI": pa.uint32(),
+    "IMO": pa.uint32(),
+    "LONGITUDE": pa.float32(),
+    "LATITUDE": pa.float32(),
+    "SHIPANDCARGOTYPECODE": pa.uint16(),
+    "SIZEA": pa.uint16(),
+    "SIZEB": pa.uint16(),
+    "SIZEC": pa.uint16(),
+    "SIZED": pa.uint16(),
+    "NAVSTATUSCODE": pa.uint8(),
+    "COG": pa.float32(),
+    "SOG": pa.float32(),
+    "TRUEHEADING": pa.uint16(),
+    "MAXDRAUGHT": pa.float32(),
+    "ROT": pa.uint8(),
+    "MESSAGEID": pa.uint8(),
+    "DESTINATION": pa.string(),
+}
 
 
 def get_date_from_file_name(file_name: str) -> str:
@@ -40,10 +72,9 @@ def unpack_tar_file(file: str, day_directory: str) -> List[str]:
 
 
 def process_csv_file(csv_files: str):
-    csv_options = csv.ConvertOptions(
-        include_columns=COLUMNS,
-        column_types=COLUMN_TYPES
-    )
+    csv_options = csv.ConvertOptions(include_columns=COLUMNS, column_types=COLUMN_TYPES)
+
+
 def main(tar_file: str):
     date = get_date_from_file_name(tar_file)
     date_directory = os.path.join(UNZIPPED_FILES_DIRECTORY, date)
@@ -58,7 +89,7 @@ if __name__ == "__main__":
         main(os.path.join(ZIPPED_FILES_DIRECTORY, sys.argv[1]))
     # day_files = os.listdir(ZIPPED_FILES_DIRECTORY)
     # day_files = [os.path.join(ZIPPED_FILES_DIRECTORY, i) for i in day_files if ".tar" in i]
-   
+
     # for day_file in day_files:
     #     print(day_file)
     #     process_day_tar_gz(day_file)

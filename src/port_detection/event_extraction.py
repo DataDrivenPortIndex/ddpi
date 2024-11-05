@@ -142,4 +142,3 @@ def process_day(day_file: str) -> pl.LazyFrame:
             ]
         )
     )
-

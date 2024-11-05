@@ -12,24 +12,19 @@ COLUMNS = ["MMSI", "MESSAGEID", "MAXDRAUGHT", "TIMESTAMPUTC", "TRUEHEADING", "h3
 
 
 def get_static_messages(df: pl.LazyFrame) -> pl.LazyFrame:
-    return df.filter(
-        pl.col("MESSAGEID").is_in(STATIC_MESSAGES)
-    ).select(
-        ["MMSI", "TIMESTAMPUTC", "MAXDRAUGHT"]
-    ).drop_nulls(
-        ["MAXDRAUGHT"]
+    return (
+        df.filter(pl.col("MESSAGEID").is_in(STATIC_MESSAGES))
+        .select(["MMSI", "TIMESTAMPUTC", "MAXDRAUGHT"])
+        .drop_nulls(["MAXDRAUGHT"])
     )
 
 
 def get_dynamic_messages(df: pl.LazyFrame, port_cells: pl.LazyFrame) -> pl.LazyFrame:
-    return df.filter(
-        pl.col("MESSAGEID").is_in(DYNAMIC_MESSAGES)
-    ).join(
-        other=port_cells, left_on="h3_cell", right_on="h3_cells", how="left"
-    ).drop_nulls(
-        ["TRUEHEADING", "id"]
-    ).select(
-        ["MMSI", "TIMESTAMPUTC", "TRUEHEADING", "h3_cell", "id"]
+    return (
+        df.filter(pl.col("MESSAGEID").is_in(DYNAMIC_MESSAGES))
+        .join(other=port_cells, left_on="h3_cell", right_on="h3_cells", how="left")
+        .drop_nulls(["TRUEHEADING", "id"])
+        .select(["MMSI", "TIMESTAMPUTC", "TRUEHEADING", "h3_cell", "id"])
     )
 
 
@@ -37,13 +32,19 @@ def process_day(df: pl.DataFrame, port_cells: pl.DataFrame) -> pl.DataFrame:
     df_static = get_static_messages(df)
     df_dynamic = get_dynamic_messages(df, port_cells)
 
-    df = df_dynamic.join_asof(other=df_static, on="TIMESTAMPUTC", by="MMSI", tolerance="60m", strategy="forward")
+    df = df_dynamic.join_asof(
+        other=df_static,
+        on="TIMESTAMPUTC",
+        by="MMSI",
+        tolerance="60m",
+        strategy="forward",
+    )
 
     return df.groupby("h3_cell").agg(
         pl.col("MAXDRAUGHT").mean().alias("draught"),
-        pl.col("TRUEHEADING").mean().alias("heading")
+        pl.col("TRUEHEADING").mean().alias("heading"),
     )
-    
+
 
 def main():
     port_stats = None
@@ -53,7 +54,9 @@ def main():
         year_path = os.path.join(INPUT_DIRECTORY, year)
         for day in tqdm.tqdm(os.listdir(year_path)):
             try:
-                df = pl.read_parquet(f"{os.path.join(year_path, day)}/*.parquet", columns=COLUMNS)
+                df = pl.read_parquet(
+                    f"{os.path.join(year_path, day)}/*.parquet", columns=COLUMNS
+                )
                 df = process_day(df, port_cells_df)
 
                 if port_stats is not None:

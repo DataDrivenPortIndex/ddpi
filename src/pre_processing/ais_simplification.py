@@ -135,8 +135,7 @@ def simplifiy(day: str, output_directory: str):
         df = aggregate_ais(df)
 
         df = df.filter(
-            (~pl.col("LATITUDE").is_infinite())
-            & (~pl.col("LONGITUDE").is_infinite())
+            (~pl.col("LATITUDE").is_infinite()) & (~pl.col("LONGITUDE").is_infinite())
         )
 
         # TODO: remove type conversion and handle this in rust

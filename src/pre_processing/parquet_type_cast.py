@@ -12,9 +12,26 @@ H3_RESOLUTION = 11
 NUMBER_OF_WORKERS = 10
 H3_ROUGH_RESOLUTION = 6
 INPUT_DIRECTOR = "/media/pbusenius/BigData/AIS"
-COLUMNS = ["MMSI", "TIMESTAMPUTC", "LONGITUDE", "LATITUDE", "SHIPANDCARGOTYPECODE",
-           "SIZEA", "SIZEB", "SIZEC", "SIZED", "NAVSTATUSCODE", "COG", "SOG", "TRUEHEADING", 
-           "MAXDRAUGHT", "ROT", "MESSAGEID", "DESTINATION", "MESSAGESOURCE"]
+COLUMNS = [
+    "MMSI",
+    "TIMESTAMPUTC",
+    "LONGITUDE",
+    "LATITUDE",
+    "SHIPANDCARGOTYPECODE",
+    "SIZEA",
+    "SIZEB",
+    "SIZEC",
+    "SIZED",
+    "NAVSTATUSCODE",
+    "COG",
+    "SOG",
+    "TRUEHEADING",
+    "MAXDRAUGHT",
+    "ROT",
+    "MESSAGEID",
+    "DESTINATION",
+    "MESSAGESOURCE",
+]
 
 
 def compute_h3_cell(values: Tuple[float]) -> int:
@@ -42,7 +59,9 @@ def cast_types(df: pl.DataFrame) -> pl.DataFrame:
         pl.col("MAXDRAUGHT").cast(pl.Float32(), strict=False),
         pl.col("ROT").cast(pl.Int8(), strict=False),
         pl.col("DESTINATION").cast(pl.Utf8(), strict=True),
-        pl.col("MESSAGESOURCE").map_dict({"AIS-T": True, "AIS-S": False}).alias("terrestrial_message"),
+        pl.col("MESSAGESOURCE")
+        .map_dict({"AIS-T": True, "AIS-S": False})
+        .alias("terrestrial_message"),
     )
 
     df = df.drop(["MESSAGESOURCE"])
@@ -53,15 +72,15 @@ def cast_types(df: pl.DataFrame) -> pl.DataFrame:
 def process_hour_file(hour_file: str):
     if "type_cast" in hour_file:
         return
-    
+
     if os.path.exists(hour_file.replace(".parquet", "_type_cast.parquet")):
         return
-    
+
     try:
         df = pl.read_parquet(hour_file, columns=COLUMNS)
     except:
         return
-    
+
     try:
         df = cast_types(df)
     except pl.ComputeError:
@@ -71,7 +90,9 @@ def process_hour_file(hour_file: str):
 
 
 def main(day_path):
-    hour_files = [os.path.join(day_path, hour_file) for hour_file in os.listdir(day_path)]
+    hour_files = [
+        os.path.join(day_path, hour_file) for hour_file in os.listdir(day_path)
+    ]
     for hour_file in tqdm.tqdm(hour_files):
         process_hour_file(hour_file)
 

@@ -16,7 +16,7 @@ def polyfill(polygon: Polygon, resolution: int) -> Set[str]:
     return h3.polyfill(
         json.loads(gpd.GeoSeries([polygon]).to_json())["features"][0]["geometry"],
         resolution,
-        geo_json_conformant=True
+        geo_json_conformant=True,
     )
 
 
@@ -33,7 +33,9 @@ def buffer_polygon(df: gpd.GeoDataFrame, buffer: float) -> gpd.GeoDataFrame:
 
 def main():
     ddpi_df = pd.read_csv(DDPI_CSV_FILE)
-    ddpi_gdf = gpd.GeoDataFrame(ddpi_df, geometry=gpd.GeoSeries.from_wkt(ddpi_df["geom"]))[["id", "geometry"]]
+    ddpi_gdf = gpd.GeoDataFrame(
+        ddpi_df, geometry=gpd.GeoSeries.from_wkt(ddpi_df["geom"])
+    )[["id", "geometry"]]
 
     ddpi_gdf.crs = "EPSG:4326"
 
@@ -41,8 +43,12 @@ def main():
         buffer = get_buffer_size(h3_resolution)
         buffered_ddpi_gdf = buffer_polygon(ddpi_gdf, buffer)
         buffered_ddpi_gdf.to_csv(f"data/{h3_resolution}.csv")
-        buffered_ddpi_gdf["h3_cells"] = np.vectorize(polyfill)(buffered_ddpi_gdf["geometry"], h3_resolution)
-        buffered_ddpi_gdf[["id", "h3_cells"]].explode("h3_cells").to_csv(f"h3_cells_resolution_{h3_resolution}.csv", index=False)
+        buffered_ddpi_gdf["h3_cells"] = np.vectorize(polyfill)(
+            buffered_ddpi_gdf["geometry"], h3_resolution
+        )
+        buffered_ddpi_gdf[["id", "h3_cells"]].explode("h3_cells").to_csv(
+            f"h3_cells_resolution_{h3_resolution}.csv", index=False
+        )
 
 
 if __name__ == "__main__":
