@@ -4,6 +4,7 @@ import polars as pl
 from tqdm import tqdm
 from dotenv import load_dotenv
 
+from src.port_detection import cluster_generation
 from src.port_detection import event_extraction
 from src.port_detection import event_validation
 from src.pre_processing import ais_simplification
@@ -73,17 +74,18 @@ def main():
     print("Data Preparation")
 
     print("\tPerform AIS-Simplification:")
-    simplification(ais_input_directory, ais_simplified_directory)
+    # simplification(ais_input_directory, ais_simplified_directory)
 
     print("Port-Event-Processing")
 
     print("\tPerform Port-Event-Extraction:")
-    extraction(ais_simplified_directory, ais_port_events_directory, ["2020"])
+    # extraction(ais_simplified_directory, ais_port_events_directory, ["2020"])
 
     print("\tPerform Port-Event-Validation:")
     validation(ais_port_events_directory, ais_validated_port_events_directory)
 
     print("\tPerform Port-Clustering:")
+    # cluster_generation.generate("/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv")
 
 
 if __name__ == "__main__":
