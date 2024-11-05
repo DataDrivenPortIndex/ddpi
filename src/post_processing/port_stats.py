@@ -53,19 +53,15 @@ def main():
     for year in YEARS_WANTED:
         year_path = os.path.join(INPUT_DIRECTORY, year)
         for day in tqdm.tqdm(os.listdir(year_path)):
-            try:
-                df = pl.read_parquet(
-                    f"{os.path.join(year_path, day)}/*.parquet", columns=COLUMNS
-                )
-                df = process_day(df, port_cells_df)
+            df = pl.read_parquet(
+                f"{os.path.join(year_path, day)}/*.parquet", columns=COLUMNS
+            )
+            df = process_day(df, port_cells_df)
 
-                if port_stats is not None:
-                    port_stats.extend(df)
-                else:
-                    port_stats = df
-            except:
-                print(day)
-                break
+            if port_stats is not None:
+                port_stats.extend(df)
+            else:
+                port_stats = df
 
     port_stats.groupby("h3_cell").agg(
         pl.col("draught").mean(),
