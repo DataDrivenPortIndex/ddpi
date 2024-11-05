@@ -29,23 +29,24 @@ def simplification(input_directory: str, output_directory: str):
         ais_simplification.simplifiy(day_file_path, output_directory)
 
 
-def extraction(input_directory: str, output_directory: str, year: str):
+def extraction(input_directory: str, output_directory: str, years: str):
     dfs = []
 
-    output_file = os.path.join(output_directory, f"port_events_{year}.parquet")
+    for year in years:
+        output_file = os.path.join(output_directory, f"port_events_{year}.parquet")
+        for day_file in tqdm(os.listdir(input_directory)):
+            if year in day_file:
+                if os.path.isfile(output_file):
+                    continue
 
-    for day_file in tqdm(os.listdir(input_directory)):
-        if os.path.isfile(output_file):
-            continue
+                day_file_path = os.path.join(input_directory, day_file)
 
-        day_file_path = os.path.join(input_directory, day_file)
+                df_lazy = event_extraction.process_day(day_file_path)
 
-        df_lazy = event_extraction.process_day(day_file_path)
+                dfs.append(df_lazy)
 
-        dfs.append(df_lazy)
-
-    if not os.path.isfile(output_file):
-        pl.concat(dfs).write_parquet(output_file)
+            if not os.path.isfile(output_file):
+                pl.concat(dfs).write_parquet(output_file)
 
 
 def validation(input_directory: str, output_directory: str):
@@ -64,11 +65,15 @@ def main():
 
     print("Processing\n")
 
+    print("Pre-Processing\n")
+
     print("Perform AIS-Simplification:")
     simplification(ais_input_directory, ais_simplified_directory)
 
+    print("Port-Event-processing\n")
+
     print("Perform Port-Event-Extraction:")
-    extraction(ais_simplified_directory, ais_port_events_directory, "2020")
+    extraction(ais_simplified_directory, ais_port_events_directory, ["2020"])
 
     print("Perform Port-Event-Validation:")
     validation(ais_port_events_directory, ".")
