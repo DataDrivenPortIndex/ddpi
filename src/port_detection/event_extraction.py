@@ -17,16 +17,20 @@ NAV_STATUS_CODES = {"moored": 5, "anchored": 1}
 
 
 def process_day(day_file: str) -> pl.LazyFrame:
-    df_lazy = pl.scan_parquet(day_file).with_columns(
+    df_lazy = (
+        pl.scan_parquet(day_file)
+        .with_columns(
             pl.col("NAVSTATUSCODE").cast(pl.Int64),
             (pl.col("COG").abs().sub(pl.col("TRUEHEADING").abs())).abs().alias("DRIFT"),
             pl.col("TIMESTAMPUTC").dt.replace_time_zone("UTC").set_sorted(),
-        ).group_by_dynamic(
+        )
+        .group_by_dynamic(
             "TIMESTAMPUTC",
             every=DYNAMIC_GROUPBY_EVERY,
             period=DYNAMIC_GROUPBY_PERIOD,
             by="MMSI",
-        ).agg(
+        )
+        .agg(
             pl.col("LATITUDE").first(),
             pl.col("LONGITUDE").first(),
             pl.col("SOG").max(),
@@ -47,32 +51,28 @@ def process_day(day_file: str) -> pl.LazyFrame:
             (pl.col("ROT").quantile(0.25) - pl.col("ROT").quantile(0.75))
             .abs()
             .alias("rate_of_turn_iqr"),
-        ).filter(pl.col("number_of_messages") >= MINIMUN_NUMBER_OF_MESSAGES).with_columns(
+        )
+        .filter(pl.col("number_of_messages") >= MINIMUN_NUMBER_OF_MESSAGES)
+        .with_columns(
             pl.col("NAVSTATUSCODE")
             .list.contains(NAV_STATUS_CODES["moored"])
             .alias("is_moored_event"),
             pl.col("NAVSTATUSCODE")
             .list.contains(NAV_STATUS_CODES["anchored"])
             .alias("is_anchored_event"),
-        ).filter(
+        )
+        .filter(
             (pl.col("is_moored_event"))
             | (pl.col("is_anchored_event"))
-            | (pl.col("SOG") <= SPEED_OVER_GROUND_THRESHOLD) 
-            | (
-                pl.col("number_of_h3_cells") == NUMBER_OF_H3_CELLS_THRESHOLD
-            )  
-            | (
-                pl.col("MAXDRAUGHT").len() >= DRAUGHT_COUNT_THRESHOLD
-            ) 
-            | (pl.col("drift_iqr") >= DRIFT_THRESHOLD) 
+            | (pl.col("SOG") <= SPEED_OVER_GROUND_THRESHOLD)
+            | (pl.col("number_of_h3_cells") == NUMBER_OF_H3_CELLS_THRESHOLD)
+            | (pl.col("MAXDRAUGHT").len() >= DRAUGHT_COUNT_THRESHOLD)
+            | (pl.col("drift_iqr") >= DRIFT_THRESHOLD)
             | (pl.col("cog_iqr") <= COG_IQR_THRESHOLD)
-            | (
-                pl.col("rate_of_turn_iqr") <= RATE_OF_TURN_THRESHOLD
-            )  
-            | (
-                pl.col("DESTINATION").len() >= DESTINATION_COUNT_THRESHOLD
-            )  
-        ).with_columns(
+            | (pl.col("rate_of_turn_iqr") <= RATE_OF_TURN_THRESHOLD)
+            | (pl.col("DESTINATION").len() >= DESTINATION_COUNT_THRESHOLD)
+        )
+        .with_columns(
             pl.when(pl.col("SOG") <= SPEED_OVER_GROUND_THRESHOLD)
             .then(True)
             .otherwise(False)
@@ -118,7 +118,8 @@ def process_day(day_file: str) -> pl.LazyFrame:
             .otherwise(False)
             .cast(pl.UInt8)
             .alias("is_anchored_event"),
-        ).drop(
+        )
+        .drop(
             [
                 "NAVSTATUSCODE",
                 "SHIPANDCARGOTYPECODE",
@@ -132,5 +133,6 @@ def process_day(day_file: str) -> pl.LazyFrame:
                 "MAXDRAUGHT",
             ]
         )
-    
+    )
+
     return df_lazy.collect()
