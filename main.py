@@ -42,7 +42,6 @@ def extraction(input_directory: str, output_directory: str, year: str):
     pl.concat(dfs).write_parquet(output_file)
 
 def main():
-    # ais simplification
     ais_input_directory = get_env("AIS_INPUT_DIRECTORY")
     ais_simplified_directory = get_env("AIS_SIMPLIFIED_DIRECTORY")
 
