@@ -15,12 +15,9 @@ UNZIPPED_FILES_DIRECTORY = "/media/pbusenius/BigData/AIS/2021"
 def unpack_tar_file(file: str, day_directory: str) -> Generator[str, None, None]:
     if ".tar" in file:
         with tarfile.open(file) as t:
-            try:
-                for f in t.getmembers():
-                    t.extract(f, day_directory)
-                    yield os.path.join(day_directory, f.name)
-            except:
-                print(file)
+            for f in t.getmembers():
+                t.extract(f, day_directory)
+                yield os.path.join(day_directory, f.name)
 
 
 def get_date_from_file_name(file_name: str) -> str:
