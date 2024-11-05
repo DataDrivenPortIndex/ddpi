@@ -76,10 +76,7 @@ def process_hour_file(hour_file: str):
     if os.path.exists(hour_file.replace(".parquet", "_type_cast.parquet")):
         return
 
-    try:
-        df = pl.read_parquet(hour_file, columns=COLUMNS)
-    except:
-        return
+    df = pl.read_parquet(hour_file, columns=COLUMNS)
 
     try:
         df = cast_types(df)
