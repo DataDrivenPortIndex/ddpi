@@ -5,6 +5,7 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 
 from src.port_detection import event_extraction
+from src.port_detection import event_validation
 from src.pre_processing import ais_simplification
 from src.errors.env import MissingEnvironmentVariable
 
@@ -30,16 +31,29 @@ def simplification(input_directory: str, output_directory: str):
 
 def extraction(input_directory: str, output_directory: str, year: str):
     dfs = []
+
+    output_file = os.path.join(output_directory, f"port_events_{year}.parquet")
+
     for day_file in tqdm(os.listdir(input_directory)):
+        if os.path.isfile(output_file):
+            continue
+
         day_file_path = os.path.join(input_directory, day_file)
 
         df_lazy = event_extraction.process_day(day_file_path)
 
         dfs.append(df_lazy)
 
-    output_file = os.path.join(output_directory, f"port_events_{year}.parquet")
+    if not os.path.isfile(output_file):
+        pl.concat(dfs).write_parquet(output_file)
 
-    pl.concat(dfs).write_parquet(output_file)
+
+def validation(input_directory: str, output_directory: str):
+    for port_event_file in tqdm(os.listdir(input_directory)):
+        event_file_path = os.path.join(input_directory, port_event_file)
+        validated_event_file_path = os.path.join(output_directory, f"validated_{port_event_file}")
+        
+        event_validation.validate(event_file_path, validated_event_file_path)
 
 
 def main():
@@ -57,6 +71,7 @@ def main():
     extraction(ais_simplified_directory, ais_port_events_directory, "2020")
 
     print("Perform Port-Event-Validation:")
+    validation(ais_port_events_directory, ".")
 
     print("Perform Port-Clustering:")
 
