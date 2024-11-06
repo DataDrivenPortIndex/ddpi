@@ -17,7 +17,7 @@ load_dotenv(override=True)
 def get_enviroment_variable(name: str) -> str:
     value = os.getenv(name)
 
-    if value is not None and value != "" and "XXXXX" not in value :
+    if value is not None and value != "" and "XXXXX" not in value:
         print(f"\tEnviroment variable '{name}' set to:\t\t {value}")
         return value
 
@@ -40,7 +40,6 @@ def extraction(input_directory: str, output_directory: str, years: str):
                 if os.path.isfile(output_file):
                     continue
                 try:
-
                     day_file_path = os.path.join(input_directory, day_file)
 
                     df_lazy = event_extraction.process_day(day_file_path)
@@ -57,8 +56,10 @@ def extraction(input_directory: str, output_directory: str, years: str):
 def validation(input_directory: str, output_directory: str):
     for port_event_file in tqdm(os.listdir(input_directory)):
         event_file_path = os.path.join(input_directory, port_event_file)
-        validated_event_file_path = os.path.join(output_directory, f"validated_{port_event_file.split('.')[0]}.csv")
-        
+        validated_event_file_path = os.path.join(
+            output_directory, f"validated_{port_event_file.split('.')[0]}.csv"
+        )
+
         event_validation.validate(event_file_path, validated_event_file_path)
 
 
@@ -67,25 +68,29 @@ def main():
     ais_input_directory = get_enviroment_variable("AIS_INPUT_DIRECTORY")
     ais_simplified_directory = get_enviroment_variable("AIS_SIMPLIFIED_DIRECTORY")
     ais_port_events_directory = get_enviroment_variable("AIS_PORT_EVENTS_DIRECTORY")
-    ais_validated_port_events_directory = get_enviroment_variable("AIS_VALIDATED_PORT_EVENTS_DIRECTORY")
+    ais_validated_port_events_directory = get_enviroment_variable(
+        "AIS_VALIDATED_PORT_EVENTS_DIRECTORY"
+    )
 
     print("Processing\n")
 
     print("Data Preparation")
 
     print("\tPerform AIS-Simplification:")
-    # simplification(ais_input_directory, ais_simplified_directory)
+    simplification(ais_input_directory, ais_simplified_directory)
 
     print("Port-Event-Processing")
 
     print("\tPerform Port-Event-Extraction:")
-    # extraction(ais_simplified_directory, ais_port_events_directory, ["2020"])
+    extraction(ais_simplified_directory, ais_port_events_directory, ["2020"])
 
     print("\tPerform Port-Event-Validation:")
     validation(ais_port_events_directory, ais_validated_port_events_directory)
 
     print("\tPerform Port-Clustering:")
-    # cluster_generation.generate("/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv")
+    cluster_generation.generate(
+        "/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv"
+    )
 
 
 if __name__ == "__main__":
