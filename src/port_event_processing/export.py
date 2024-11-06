@@ -7,7 +7,7 @@ from h3ronpy import ContainmentMode
 H3_POLYFILL_MODE = ContainmentMode.Covers
 
 
-def as_h3_csv(gdf: gpd.GeoDataFrame, file_name: str,  resolution: int):
+def as_h3_csv(gdf: gpd.GeoDataFrame, file_name: str, resolution: int):
     df_ddpi = geodataframe_to_cells(gdf, resolution, containment_mode=H3_POLYFILL_MODE)
 
     df_ddpi["cell"] = df_ddpi["cell"].apply(hex)

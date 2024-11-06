@@ -99,6 +99,4 @@ def generate(port_events_file: str) -> gpd.GeoDataFrame:
     # combine ports and anchorages
     gdf_ddpi = combine_port_anchorage(port_gdf, anchorage_gdf)
 
-    print(gdf_ddpi)
-
     return gdf_ddpi
