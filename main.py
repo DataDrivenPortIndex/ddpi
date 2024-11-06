@@ -9,7 +9,7 @@ from src.port_detection import export
 from src.port_detection import cluster_generation
 from src.port_detection import event_extraction
 from src.port_detection import event_validation
-from src.pre_processing import ais_simplification
+from src.data_preparation import ais_simplification
 from src.errors.env import MissingEnvironmentVariable
 
 
