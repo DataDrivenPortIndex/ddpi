@@ -37,7 +37,7 @@ def get_data_from_csv(file: str) -> gpd.GeoDataFrame:
     )
 
 
-def create_port_polygon(gdf: gpd.GeoDataFrame, buffer=False) -> gpd.GeoDataFrame:
+def create_polygon(gdf: gpd.GeoDataFrame, buffer=False) -> gpd.GeoDataFrame:
     port_gdf = (
         gdf.groupby(["cluster_id"])
         .agg(
@@ -80,14 +80,14 @@ def generate(port_events_file: str):
     # process ports
     port_gdf = filter_port_type(gdf, "port_score", PORT_THRESHOLD)
     port_gdf = cluster_points(port_gdf)
-    port_gdf = create_port_polygon(port_gdf, buffer=True)
+    port_gdf = create_polygon(port_gdf, buffer=True)
     port_gdf.drop(columns=["cluster_id"], inplace=True, axis=1)
     port_gdf["is_anchorage"] = False
 
     # process anchorages
     anchorage_gdf = filter_port_type(gdf, "anchorage_score", ANCHORAGE_THRESHOLD)
     anchorage_gdf = cluster_points(anchorage_gdf)
-    anchorage_gdf = create_port_polygon(anchorage_gdf, buffer=True)
+    anchorage_gdf = create_polygon(anchorage_gdf, buffer=True)
     anchorage_gdf.drop(["cluster_id"], inplace=True, axis=1)
     anchorage_gdf["is_anchorage"] = True
 
