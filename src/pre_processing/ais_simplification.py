@@ -4,7 +4,7 @@ import polars as pl
 from typing import Dict
 from pyo3_h3 import parallel_lat_lon_to_cell
 
-H3_RESOLUTION = 11
+H3_RESOLUTION = 10
 H3_ROUGH_RESOLUTION = 6
 OUTPUT_DIRECTORY = "/media/pbusenius/BigData/AIS/simplified"
 AIS_COLUMNS = [
