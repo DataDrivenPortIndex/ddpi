@@ -59,7 +59,7 @@ def create_port_polygon(gdf: gpd.GeoDataFrame, buffer=False) -> gpd.GeoDataFrame
 
 
 def combine_port_anchorage(gdf_port: gpd.GeoDataFrame, gdf_anchorage: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    ddpi_gdf = pd.concat([gdf_port, gdf_anchorage])
+    ddpi_gdf = pd.concat([gdf_port, gdf_anchorage], ignore_index=True)
     ddpi_gdf.rename(columns={"geometry": "geom"}, inplace=True)
     ddpi_gdf.index.name = "id"
 
