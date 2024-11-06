@@ -5,6 +5,7 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 from prettytable import PrettyTable
 
+from src.post_processing import country_code
 from src.port_event_processing import export
 from src.port_event_processing import cluster_generation
 from src.port_event_processing import event_extraction
@@ -83,8 +84,6 @@ def main():
 
     print(table)
 
-    print("Processing\n")
-
     # Data-Preparation ##################################################################################
     simplification(ais_input_directory, ais_simplified_directory)
 
@@ -97,14 +96,15 @@ def main():
         "/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv"
     )
 
+    # DDPI-Aggregation ##################################################################################
+    # TODO remove polygon overlaps
+    gdf_country_code = country_code.add_country_code(gdf)
+
     # DDPI Export #######################################################################################
     export.as_csv(gdf, "test.csv")
     export.as_h3_csv(gdf, "test_h3.csv", 10)
+    export.as_csv(gdf_country_code, "test_country_code.csv")
 
-    # DDPI-Aggregation ##################################################################################
-    # TODO add country names
-    # TODO remove polygon overlaps
-        
 
 if __name__ == "__main__":
     main()

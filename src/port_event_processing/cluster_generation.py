@@ -82,7 +82,7 @@ def filter_port_type(
 
 def generate(port_events_file: str) -> gpd.GeoDataFrame:
     gdf = get_data_from_csv(port_events_file)
-    
+
     # process ports #####################################################################################
     port_gdf = filter_port_type(gdf, "port_score", PORT_THRESHOLD)
     port_gdf = cluster_points(port_gdf)
