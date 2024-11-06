@@ -77,24 +77,21 @@ def filter_port_type(
 def generate(port_events_file: str):
     gdf = get_data_from_csv(port_events_file)
 
-    ports_gdf = filter_port_type(gdf, "port_score", PORT_THRESHOLD)
+    # process ports
+    port_gdf = filter_port_type(gdf, "port_score", PORT_THRESHOLD)
+    port_gdf = cluster_points(port_gdf)
+    port_gdf = create_port_polygon(port_gdf, buffer=True)
+    port_gdf.drop(columns=["cluster_id"], inplace=True, axis=1)
+    port_gdf["is_anchorage"] = False
+
+    # process anchorages
     anchorage_gdf = filter_port_type(gdf, "anchorage_score", ANCHORAGE_THRESHOLD)
+    anchorage_gdf = cluster_points(anchorage_gdf)
+    anchorage_gdf = create_port_polygon(anchorage_gdf, buffer=True)
+    anchorage_gdf.drop(["cluster_id"], inplace=True, axis=1)
+    anchorage_gdf["is_anchorage"] = True
 
-    gdf_ports = cluster_points(ports_gdf)
-    gdf_anchorage = cluster_points(anchorage_gdf)
-
-    gdf_ports = create_port_polygon(gdf_ports, buffer=True)
-    gdf_anchorage = create_port_polygon(gdf_anchorage, buffer=True)
-
-    gdf_ports.drop(columns=["cluster_id"], inplace=True, axis=1)
-    gdf_anchorage.drop(["cluster_id"], inplace=True, axis=1)
-
-    gdf_ports["is_anchorage"] = False
-    gdf_anchorage["is_anchorage"] = True
-
-    gdf_ports.to_csv("ddpi_ports.csv")
-    gdf_anchorage.to_csv("ddpi_anchorage.csv")
-
-    gdf_ddpi = combine_port_anchorage(gdf_ports, gdf_anchorage)
+    # combine ports and anchorages
+    gdf_ddpi = combine_port_anchorage(port_gdf, anchorage_gdf)
 
     gdf_ddpi.to_csv("ddpi.csv")
