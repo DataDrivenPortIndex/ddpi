@@ -5,12 +5,15 @@ from shapely import geometry
 from sklearn.cluster import DBSCAN
 
 
+DBSCAN_EPS = 0.02
+DBSCAN_MIN_SAMPLES = 5
+POLYFON_BUFFER = 0.003
 PORT_THRESHOLD = 0.6
 ANCHORAGE_THRESHOLD = 0.6
 
 
 def cluster_points(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    clustering = DBSCAN(eps=0.02, min_samples=5).fit(
+    clustering = DBSCAN(eps=DBSCAN_EPS, min_samples=DBSCAN_MIN_SAMPLES).fit(
         gdf[["LONGITUDE", "LATITUDE"]].to_numpy()
     )
     gdf["cluster_id"] = clustering.labels_
@@ -51,7 +54,7 @@ def create_polygon(gdf: gpd.GeoDataFrame, buffer=False) -> gpd.GeoDataFrame:
     port_gdf = port_gdf.set_geometry("geometry")
 
     if buffer:
-        port_gdf["geometry"] = port_gdf.geometry.buffer(0.003)
+        port_gdf["geometry"] = port_gdf.geometry.buffer(POLYFON_BUFFER)
 
     port_gdf = port_gdf.loc[port_gdf.geometry.geometry.type == "Polygon"]
 
@@ -62,8 +65,6 @@ def combine_port_anchorage(
     gdf_port: gpd.GeoDataFrame, gdf_anchorage: gpd.GeoDataFrame
 ) -> gpd.GeoDataFrame:
     ddpi_gdf = pd.concat([gdf_port, gdf_anchorage], ignore_index=True)
-    # ddpi_gdf.rename(columns={"geometry": "geom"}, inplace=True)
-    # ddpi_gdf.index.name = "id"
 
     ddpi_gdf["id"] = range(len(ddpi_gdf))
     ddpi_gdf.insert(0, "ddpi_id", ddpi_gdf["id"])
@@ -81,22 +82,22 @@ def filter_port_type(
 
 def generate(port_events_file: str) -> gpd.GeoDataFrame:
     gdf = get_data_from_csv(port_events_file)
-
-    # process ports
+    
+    # process ports######################################################################################
     port_gdf = filter_port_type(gdf, "port_score", PORT_THRESHOLD)
     port_gdf = cluster_points(port_gdf)
     port_gdf = create_polygon(port_gdf, buffer=True)
     port_gdf.drop(columns=["cluster_id"], inplace=True, axis=1)
     port_gdf["is_anchorage"] = False
 
-    # process anchorages
+    # process anchorages#################################################################################
     anchorage_gdf = filter_port_type(gdf, "anchorage_score", ANCHORAGE_THRESHOLD)
     anchorage_gdf = cluster_points(anchorage_gdf)
     anchorage_gdf = create_polygon(anchorage_gdf, buffer=True)
     anchorage_gdf.drop(["cluster_id"], inplace=True, axis=1)
     anchorage_gdf["is_anchorage"] = True
 
-    # combine ports and anchorages
+    # combine ports and anchorages#######################################################################
     gdf_ddpi = combine_port_anchorage(port_gdf, anchorage_gdf)
 
     return gdf_ddpi
