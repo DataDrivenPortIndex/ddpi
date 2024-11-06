@@ -3,6 +3,7 @@ import polars as pl
 
 from tqdm import tqdm
 from dotenv import load_dotenv
+from prettytable import PrettyTable
 
 from src.port_detection import cluster_generation
 from src.port_detection import event_extraction
@@ -14,11 +15,11 @@ from src.errors.env import MissingEnvironmentVariable
 load_dotenv(override=True)
 
 
-def get_enviroment_variable(name: str) -> str:
+def get_enviroment_variable(table, name: str) -> str:
     value = os.getenv(name)
 
     if value is not None and value != "" and "XXXXX" not in value:
-        print(f"\tEnviroment variable '{name}' set to:\t\t {value}")
+        table.add_row([name, value])
         return value
 
     raise MissingEnvironmentVariable(f"Enviroment variable'{name}' does not exist")
@@ -64,13 +65,23 @@ def validation(input_directory: str, output_directory: str):
 
 
 def main():
+    table = PrettyTable(padding_width=5)
+    table.align = "l"
+    table.field_names = ["Enviroment Variable", "Value"]
     print("Setup")
-    ais_input_directory = get_enviroment_variable("AIS_INPUT_DIRECTORY")
-    ais_simplified_directory = get_enviroment_variable("AIS_SIMPLIFIED_DIRECTORY")
-    ais_port_events_directory = get_enviroment_variable("AIS_PORT_EVENTS_DIRECTORY")
-    ais_validated_port_events_directory = get_enviroment_variable(
-        "AIS_VALIDATED_PORT_EVENTS_DIRECTORY"
+
+    ais_input_directory = get_enviroment_variable(table, "AIS_INPUT_DIRECTORY")
+    ais_simplified_directory = get_enviroment_variable(
+        table, "AIS_SIMPLIFIED_DIRECTORY"
     )
+    ais_port_events_directory = get_enviroment_variable(
+        table, "AIS_PORT_EVENTS_DIRECTORY"
+    )
+    ais_validated_port_events_directory = get_enviroment_variable(
+        table, "AIS_VALIDATED_PORT_EVENTS_DIRECTORY"
+    )
+
+    print(table)
 
     print("Processing\n")
 
