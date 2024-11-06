@@ -5,6 +5,7 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 from prettytable import PrettyTable
 
+from src.port_detection import export
 from src.port_detection import cluster_generation
 from src.port_detection import event_extraction
 from src.port_detection import event_validation
@@ -99,9 +100,14 @@ def main():
     validation(ais_port_events_directory, ais_validated_port_events_directory)
 
     print("\tPerform Port-Clustering:")
-    cluster_generation.generate(
+    gdf = cluster_generation.generate(
         "/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv"
     )
+
+    print("DDPI Export:")
+    export.as_csv(gdf, "test.csv")
+    export.as_h3_csv(gdf, "test_h3.csv", 10)
+
 
 
 if __name__ == "__main__":
