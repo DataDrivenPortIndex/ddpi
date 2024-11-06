@@ -62,8 +62,13 @@ def combine_port_anchorage(
     gdf_port: gpd.GeoDataFrame, gdf_anchorage: gpd.GeoDataFrame
 ) -> gpd.GeoDataFrame:
     ddpi_gdf = pd.concat([gdf_port, gdf_anchorage], ignore_index=True)
-    ddpi_gdf.rename(columns={"geometry": "geom"}, inplace=True)
-    ddpi_gdf.index.name = "id"
+    # ddpi_gdf.rename(columns={"geometry": "geom"}, inplace=True)
+    # ddpi_gdf.index.name = "id"
+
+    ddpi_gdf["id"] = range(len(ddpi_gdf))
+    ddpi_gdf.insert(0, "ddpi_id", ddpi_gdf["id"])
+
+    ddpi_gdf.drop("id", axis=1, inplace=True)
 
     return ddpi_gdf
 
@@ -74,7 +79,7 @@ def filter_port_type(
     return gdf[gdf[field] >= threshold].copy()
 
 
-def generate(port_events_file: str):
+def generate(port_events_file: str) -> gpd.GeoDataFrame:
     gdf = get_data_from_csv(port_events_file)
 
     # process ports
@@ -94,4 +99,6 @@ def generate(port_events_file: str):
     # combine ports and anchorages
     gdf_ddpi = combine_port_anchorage(port_gdf, anchorage_gdf)
 
-    gdf_ddpi.to_csv("ddpi.csv")
+    print(gdf_ddpi)
+
+    return gdf_ddpi
