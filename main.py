@@ -86,34 +86,25 @@ def main():
     print("Processing\n")
 
     # Data-Preparation ##################################################################################
-    print("Data Preparation")
-
-    print("\tPerform AIS-Simplification:")
     simplification(ais_input_directory, ais_simplified_directory)
 
     # Port-Event-Processing #############################################################################
-    print("Port-Event-Processing")
-
-    print("\tPerform Port-Event-Extraction:")
     extraction(ais_simplified_directory, ais_port_events_directory, ["2020"])
 
-    print("\tPerform Port-Event-Validation:")
     validation(ais_port_events_directory, ais_validated_port_events_directory)
 
-    print("\tPerform Port-Clustering:")
     gdf = cluster_generation.generate(
         "/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv"
     )
-    print("Done.")
 
     # DDPI Export #######################################################################################
-    print("DDPI Export:")
-
     export.as_csv(gdf, "test.csv")
     export.as_h3_csv(gdf, "test_h3.csv", 10)
 
-    print("Done.")
-
+    # DDPI-Aggregation ##################################################################################
+    # TODO add country names
+    # TODO remove polygon overlaps
+        
 
 if __name__ == "__main__":
     main()
