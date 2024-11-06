@@ -1,7 +1,6 @@
-import pandas as pd
 import geopandas as gpd
 
-
+# TODO find geojson with better resolution
 COUNTRIES_GEOJSON = "data/countries.geojson"
 
 
