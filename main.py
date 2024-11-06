@@ -83,16 +83,15 @@ def main():
 
     print(table)
 
-    #####################################################################################################
     print("Processing\n")
+
+    # Data-Preparation ##################################################################################
     print("Data Preparation")
 
     print("\tPerform AIS-Simplification:")
     simplification(ais_input_directory, ais_simplified_directory)
 
-    print("Done")
-
-    #####################################################################################################
+    # Port-Event-Processing #############################################################################
     print("Port-Event-Processing")
 
     print("\tPerform Port-Event-Extraction:")
@@ -105,15 +104,15 @@ def main():
     gdf = cluster_generation.generate(
         "/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv"
     )
-    print("Done")
+    print("Done.")
 
-    #####################################################################################################
+    # DDPI Export #######################################################################################
     print("DDPI Export:")
 
     export.as_csv(gdf, "test.csv")
     export.as_h3_csv(gdf, "test_h3.csv", 10)
 
-    print("Done")
+    print("Done.")
 
 
 if __name__ == "__main__":
