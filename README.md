@@ -17,5 +17,14 @@ This project aims to create a comprehensive, data-driven database of internation
 
 ![ddpi](static/images/ddpi.png)
 
+## How to DDPI
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+```bash
+uv run main.py
+```
+---
 
 This project lays the foundation for a detailed and accurate port database that can be further expanded with more granular port attributes.
