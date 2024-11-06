@@ -58,10 +58,20 @@ def create_port_polygon(gdf: gpd.GeoDataFrame, buffer=False) -> gpd.GeoDataFrame
     return port_gdf
 
 
+def combine_port_anchorage(gdf_port: gpd.GeoDataFrame, gdf_anchorage: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    ddpi_gdf = pd.concat([gdf_port, gdf_anchorage])
+    ddpi_gdf.rename(columns={"geometry": "geom"}, inplace=True)
+    ddpi_gdf.index.name = "id"
+
+    return ddpi_gdf
+
+
+def buffer_polygons(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    return gdf["geometry"].simplify(0.003)
+
+
 def generate(port_events_file: str):
     gdf = get_data_from_csv(port_events_file)
-
-    print(gdf)
 
     ports_gdf = gdf[gdf["port_score"] >= PORT_THRESHOLD].copy()
     anchorage_gdf = gdf[gdf["anchorage_score"] >= ANCHORAGE_THRESHOLD].copy()
@@ -69,13 +79,11 @@ def generate(port_events_file: str):
     gdf_ports = cluster_points(ports_gdf)
     gdf_anchorage = cluster_points(anchorage_gdf)
 
-    gdf_ports = create_port_polygon(gdf_ports, buffer=False)
-    gdf_anchorage = create_port_polygon(gdf_anchorage, buffer=False)
+    gdf_ports = create_port_polygon(gdf_ports, buffer=True)
+    gdf_anchorage = create_port_polygon(gdf_anchorage, buffer=True)
 
     gdf_ports.drop(columns=["cluster_id"], inplace=True, axis=1)
     gdf_anchorage.drop(["cluster_id"], inplace=True, axis=1)
-
-    gdf_anchorage["geometry"] = gdf_anchorage["geometry"].simplify(0.000001)
 
     gdf_ports["is_anchorage"] = False
     gdf_anchorage["is_anchorage"] = True
@@ -83,8 +91,6 @@ def generate(port_events_file: str):
     gdf_ports.to_csv("ddpi_ports.csv")
     gdf_anchorage.to_csv("ddpi_anchorage.csv")
 
-    ddpi_gdf = pd.concat([gdf_ports, gdf_anchorage])
-    ddpi_gdf.rename(columns={"geometry": "geom"}, inplace=True)
-    ddpi_gdf.index.name = "id"
+    gdf_ddpi = combine_port_anchorage(gdf_ports, gdf_anchorage)
 
-    ddpi_gdf.to_csv("ddpi.csv")
+    gdf_ddpi.to_csv("ddpi.csv")
