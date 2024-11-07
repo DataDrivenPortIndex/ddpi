@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from prettytable import PrettyTable
 
 from src.post_processing import country_code
+from src.post_processing import geo_information_enrichment
 from src.port_event_processing import export
 from src.port_event_processing import cluster_generation
 from src.port_event_processing import event_extraction
@@ -98,7 +99,9 @@ def main():
 
     # DDPI-Aggregation ##################################################################################
     # TODO remove polygon overlaps
-    gdf_country_code = country_code.add_country_code(gdf)
+    # gdf_country_code = country_code.add_country_code(gdf)
+
+    gdf_country_code = geo_information_enrichment.enrich(gdf_country_code)
 
     # DDPI Export #######################################################################################
     export.as_csv(gdf, "test.csv")
