@@ -100,4 +100,6 @@ def generate(port_events_file: str) -> gpd.GeoDataFrame:
     # combine ports and anchorages ######################################################################
     gdf_ddpi = combine_port_anchorage(port_gdf, anchorage_gdf)
 
+    gdf_ddpi = gdf_ddpi.set_crs("epsg:4326")
+
     return gdf_ddpi
