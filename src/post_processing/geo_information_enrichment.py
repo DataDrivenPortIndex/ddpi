@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -26,10 +25,11 @@ def build_wpi_distance_dict(poi_gdf):
 def build_city_distance_dict(poi_gdf):
     poi_gdf = poi_gdf.drop_duplicates(subset=["name"])
     city_name = poi_gdf["name"].to_list()
+    country_name = poi_gdf["country_name"].to_list()
     distance = poi_gdf["distance"].to_list()
 
     return [
-        {"name": city_name[i], "distance": distance[i]} for i in range(len(city_name))
+        {"name": city_name[i], "country": country_name[i], "distance": distance[i]} for i in range(len(city_name))
     ]
 
 
