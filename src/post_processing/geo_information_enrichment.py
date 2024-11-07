@@ -44,12 +44,6 @@ def calculate_poi_distance(port_point, poi_gdf):
             point.y, point.x, poi_points
         )
 
-        # HACK!!!
-        if math.isnan(tmp_poi_gdf.iloc[0]["distance"]):
-            tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(
-                point.x, point.y, [(point[1], point[0]) for point in poi_points]
-            )
-
         tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_BUFFER]
 
         poi_list.append(tmp_poi_gdf)
