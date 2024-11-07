@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "fast-geo-distance>=0.3.1",
     "geopandas>=1.0.1",
     "h3>=4.1.2",
     "h3ronpy>=0.21.1",
