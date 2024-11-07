@@ -41,8 +41,8 @@ def calculate_poi_distance(port_point, poi_gdf):
     for point in split_port_polygon_into_n_sepments(port_point, 5):
         tmp_poi_gdf = poi_gdf.copy()
         tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(
-            point.y, point.x, poi_points
-        )
+                    point.y, point.x, poi_points
+                )
 
         tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_BUFFER]
 

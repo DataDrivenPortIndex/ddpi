@@ -88,7 +88,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fast-geo-distance", specifier = ">=0.3.1" },
+    { name = "fast-geo-distance", specifier = ">=0.4.2" },
     { name = "geopandas", specifier = ">=1.0.1" },
     { name = "h3", specifier = ">=4.1.2" },
     { name = "h3ronpy", specifier = ">=0.21.1" },
@@ -104,24 +104,24 @@ requires-dist = [
 
 [[package]]
 name = "fast-geo-distance"
-version = "0.3.1"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e2/7d/f836f61e71697f3a16d95f45a18e954c997433f59b4fbddef3c8f3a56bb6/fast_geo_distance-0.3.1.tar.gz", hash = "sha256:edd59943fef2f1d0e9b17a0180bb7f23debe0b5ee50034bb7a720a54345f4fdb", size = 7198 }
+sdist = { url = "https://files.pythonhosted.org/packages/62/20/253a0d76e78c1185ae5f9352c72c48447d578fe8a55c3d39884b1b29543e/fast_geo_distance-0.4.2.tar.gz", hash = "sha256:2b4cf2f129cd4d2d0b75cd832865663cd5f6f9c29e6da7ac6d470a4f1f7e0e34", size = 5875 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/e7/87c7dd7cab9fd484351b32a4c44c7395b18609f886bf60835fb4bdf60c3d/fast_geo_distance-0.3.1-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:7ee6f5369dd4de104a6c26de5d9522c6a9ed6af9bf17e1e71091f39908ba7434", size = 277280 },
-    { url = "https://files.pythonhosted.org/packages/a7/7d/5f1f81d0a084d3e7a86714d9ab14b1aea6c3e06938aa13a28826dd36094d/fast_geo_distance-0.3.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:1710580afe6a7a55054a879d580660f14086bd7c76c5c3b700820af568b85b3d", size = 273135 },
-    { url = "https://files.pythonhosted.org/packages/e9/a1/082f6d3ed87e4d713f5498b00e2a249699c5cd8b7b82191426dc0c169f16/fast_geo_distance-0.3.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ca6065bc04025e39d0d9ab0f5300c12d4825201c6401ab2164670b152b10444a", size = 324539 },
-    { url = "https://files.pythonhosted.org/packages/c6/7d/e636129b262ab5d1197a19edd3d32a814e8b25f07dd1b07ec4b2a06e2cd0/fast_geo_distance-0.3.1-cp312-cp312-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:a8609b9b3a3a764e979b82a89a02da66cab95b0b88d035cdf6d87dd95825bc39", size = 325145 },
-    { url = "https://files.pythonhosted.org/packages/c9/14/690f6bc75c9ad2aa12346fe56b1e44a34cb94e083548f156b9bf66cb9ceb/fast_geo_distance-0.3.1-cp312-cp312-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:d6b893a5fa9d88cd4f1a54a8c2d68f5e1725f77f936b67881fcd3a1fb3353e7e", size = 330976 },
-    { url = "https://files.pythonhosted.org/packages/cf/44/853e21b9727295557ad3398938461e5becabccc57aee55eb87b3f7ba9d7f/fast_geo_distance-0.3.1-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:962845773714f0831552bfa4a5edd567bdf2082e8d89d345f98126de425e20c9", size = 357818 },
-    { url = "https://files.pythonhosted.org/packages/73/88/eae6de983a73deeb2e47452a0500c0a427ebb46a09982dce3059238f9753/fast_geo_distance-0.3.1-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:43867d2337d318789fdebe2ce98b061369a2682e811d2df37c08af3bec0bcefd", size = 381484 },
-    { url = "https://files.pythonhosted.org/packages/b2/7e/9227c1fb007d001b7dfd6ded467c15df4d7f8d4288cfb919da7dc7004387/fast_geo_distance-0.3.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:636357d083e5408315046071dac26eab8e8badf649756754f0e1acd925a5ea6c", size = 316524 },
-    { url = "https://files.pythonhosted.org/packages/e8/76/50004d65bac7648910b934f871b23f40127067de3506800ec5a92f9791c5/fast_geo_distance-0.3.1-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:1cac60bf07731c369b7bb66f7d44dd4d9cee7d95d45a2a29129149c9bdf4b869", size = 498432 },
-    { url = "https://files.pythonhosted.org/packages/c9/a7/216362659a43b2ae22ddaa2b21bac86da5f33367b534c025cd108dc6d403/fast_geo_distance-0.3.1-cp312-cp312-musllinux_1_2_armv7l.whl", hash = "sha256:f0e2a0043dd74efdff66181dbf64fc6c54dfa3f4345b8e885f8c557dfabe8773", size = 580883 },
-    { url = "https://files.pythonhosted.org/packages/dc/1f/96ae692e852655ecc52383be42f802b3b500721cedd2ea19f37de08e348b/fast_geo_distance-0.3.1-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:a77dd33997a1df915ea67c3d6e9bd82932a6c0ebff7a76e6568074b5552a897e", size = 504776 },
-    { url = "https://files.pythonhosted.org/packages/77/b6/4f5ee9d03906808fe8b523d40ebfa354cc0f8f05fb3681ca3c6032f45b46/fast_geo_distance-0.3.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:7c83a0179852360355f9c8c85898c6c001b1fef8c6e856f9a8a81287b246f0ed", size = 482762 },
-    { url = "https://files.pythonhosted.org/packages/2e/6f/5e4ff2b838266907793334de299310eb45a4c2368eb9751a9f1997256f1f/fast_geo_distance-0.3.1-cp312-none-win32.whl", hash = "sha256:6fc4f2258020799d6258ffc1aca0e5a39fb47458a7855de1000419966c38e16c", size = 156655 },
-    { url = "https://files.pythonhosted.org/packages/df/a6/34e6827009646a6d25b18b39454908a6b589fb63744ba58a3c3ce8e7a5f3/fast_geo_distance-0.3.1-cp312-none-win_amd64.whl", hash = "sha256:24df76ba30832f14b62a13389e3435965e18f3e0950635441d9bfb58b09dea51", size = 164429 },
+    { url = "https://files.pythonhosted.org/packages/44/c9/432ce2580afef6e6930dd6c3e8fdd5f87069e115432403cd43ac513d38c7/fast_geo_distance-0.4.2-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:7467e747c61ccfceb7846db7fe6b7d62b8bf0c9abf61ecbb78d5a3cc439334e8", size = 258334 },
+    { url = "https://files.pythonhosted.org/packages/98/8b/9e34beb24aeaa81f85e1d48553726edbc4b29de888b64c6bc85001963d3d/fast_geo_distance-0.4.2-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:d8db3048b829faf3c93c6b7d9fd3382a704a67c2362f2dc4f5e07b637aa63bab", size = 256384 },
+    { url = "https://files.pythonhosted.org/packages/f7/1b/9a69e96d8effae6e622e777a908fd2080e20af606eae8fad879f087a8e7d/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ca051747abf7b565641309abb3c11409cf1500b8a525da5635e43f8d78cebeef", size = 298237 },
+    { url = "https://files.pythonhosted.org/packages/ce/69/85e0077e7df77e4811309d12c2f3c8ffa245259b245c1b0caae73eb2d0dc/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:ac15a95f6235a2abd390d7c2848afb602c091e4b880854ea7d0ec9e2a85fe2b9", size = 301983 },
+    { url = "https://files.pythonhosted.org/packages/8d/14/f42b47c6865c04fca11d648cd21fc49c7f45f2ec78dbbf3714efbf955b8a/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:99c9c282707c73896ae68efe44cb20f0746e1d4c4eaf7596b685486ca911b0a7", size = 314391 },
+    { url = "https://files.pythonhosted.org/packages/0b/24/738326815101f687a4820f3743ef421978f11df2e69c2d75e76f642b230b/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:2c4966bee06545c2ef5f2519edb89b95b595a480086ef299a2677184068fd731", size = 339076 },
+    { url = "https://files.pythonhosted.org/packages/ba/22/f707afcf078b36e33548ddfd224ad48149f20f1958836dc81c5559b3c4a1/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:62242554c2fa05f6ea3d77cd9d6da67374115d8e38fe00e1a64f834c03f9f981", size = 346231 },
+    { url = "https://files.pythonhosted.org/packages/c9/06/3d8e4a94752396b9095953f28e1b7d5ec7555b7a7f9febe32cd9f6c717a5/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:798f649f91b3ee2058067afafc4fb88334fbe9078c74055535ed56ef0024414d", size = 300763 },
+    { url = "https://files.pythonhosted.org/packages/37/70/c75733cbce348c6177090e8e14826ea7f659b9ac5314b83c1eec209a0221/fast_geo_distance-0.4.2-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:faebc1193cb17ed9b4ff0ca990896b79fbc43230c816e7db6900247557cb18fc", size = 480518 },
+    { url = "https://files.pythonhosted.org/packages/1f/6f/c4201b1bc193f32a69dc60dfe417c7039d20e1449ad4de50d1c5627612fb/fast_geo_distance-0.4.2-cp312-cp312-musllinux_1_2_armv7l.whl", hash = "sha256:2bd2e70cfc74a656ffc92e99d92f0b0b81efd5faffd9bb3e177a1396f4334c2f", size = 562696 },
+    { url = "https://files.pythonhosted.org/packages/df/ad/0e25aa8de24fb57dec98f602b2cb56937bf15e5dc3e3c068295c85d8146c/fast_geo_distance-0.4.2-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:dcc38166a84d3998419831aa9be20a1b8d3a1a076c01695a4ed5a22dd72cb18a", size = 486268 },
+    { url = "https://files.pythonhosted.org/packages/24/7d/a2252bcc8162b5a7b90afd56f25e6b555001e1c7b363a7d03ec75f9e9fd3/fast_geo_distance-0.4.2-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:b47b6908280d546fc3c359df521eb252a9ac602222192047c35358f507501254", size = 465964 },
+    { url = "https://files.pythonhosted.org/packages/5c/4e/5d098e274b02fccd35c3fa8d14a486f57707e256cc06c0bcf8618aed64ab/fast_geo_distance-0.4.2-cp312-none-win32.whl", hash = "sha256:47962f3717c5f5929d49063e53fcd44a9d08e8fe2c50a510cfa6f415f762a708", size = 139199 },
+    { url = "https://files.pythonhosted.org/packages/e1/65/955cd721051b553f614e8ec4d05676f2103eeaad082a471ace7cc7087803/fast_geo_distance-0.4.2-cp312-none-win_amd64.whl", hash = "sha256:7dbaec87ee6cba7bf2e36a38ce5aa0d88528f9873282ce9ccc9fc125710c3781", size = 149092 },
 ]
 
 [[package]]
