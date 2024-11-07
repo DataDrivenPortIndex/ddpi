@@ -101,7 +101,7 @@ def main():
     # TODO remove polygon overlaps
     # gdf_country_code = country_code.add_country_code(gdf)
 
-    gdf_country_code = geo_information_enrichment.enrich(gdf_country_code)
+    gdf_country_code = geo_information_enrichment.enrich(gdf)
 
     # DDPI Export #######################################################################################
     export.as_csv(gdf, "test.csv")
