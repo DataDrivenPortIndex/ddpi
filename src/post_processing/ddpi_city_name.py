@@ -78,10 +78,7 @@ def reduce_poi_gdf(poi_gdf, ddpi_gdf):
     return pd.concat([poi_gdf, negative_gdf]).drop_duplicates(keep=False)
 
 
-def main():
-    ddpi_gdf = gpd.read_file(DDPI_FILE)
-    # ddpi_gdf = ddpi_gdf[ddpi_gdf["id"]==1656]
-
+def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     buffered_ddpi_gdf = ddpi_gdf.copy()
     buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(
         DDPI_BUFFER / 111111
@@ -107,9 +104,4 @@ def main():
         axis=1,
     )
 
-    with open("test__.geojson", "w") as file:
-        file.write(ddpi_gdf.to_json())
-
-
-if __name__ == "__main__":
-    main()
+    return ddpi_gdf
