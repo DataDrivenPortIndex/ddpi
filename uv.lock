@@ -83,6 +83,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "scikit-learn" },
     { name = "seaborn" },
+    { name = "shapely" },
     { name = "tqdm" },
 ]
 
@@ -99,6 +100,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "scikit-learn", specifier = ">=1.5.2" },
     { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "shapely", specifier = ">=2.0.6" },
     { name = "tqdm", specifier = ">=4.66.6" },
 ]
 
@@ -116,6 +118,7 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/24/738326815101f687a4820f3743ef421978f11df2e69c2d75e76f642b230b/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:2c4966bee06545c2ef5f2519edb89b95b595a480086ef299a2677184068fd731", size = 339076 },
     { url = "https://files.pythonhosted.org/packages/ba/22/f707afcf078b36e33548ddfd224ad48149f20f1958836dc81c5559b3c4a1/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:62242554c2fa05f6ea3d77cd9d6da67374115d8e38fe00e1a64f834c03f9f981", size = 346231 },
     { url = "https://files.pythonhosted.org/packages/c9/06/3d8e4a94752396b9095953f28e1b7d5ec7555b7a7f9febe32cd9f6c717a5/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:798f649f91b3ee2058067afafc4fb88334fbe9078c74055535ed56ef0024414d", size = 300763 },
+    { url = "https://files.pythonhosted.org/packages/ac/f9/c8927ea716d8ee54552cf736c01ede6976fae30c7ed9e9fc7d7830fa2d63/fast_geo_distance-0.4.2-cp312-cp312-manylinux_2_38_x86_64.whl", hash = "sha256:57e1413f74bc7f882b5e70ac6e9a28685b84153543da2a924f5c2f3d82732539", size = 300469 },
     { url = "https://files.pythonhosted.org/packages/37/70/c75733cbce348c6177090e8e14826ea7f659b9ac5314b83c1eec209a0221/fast_geo_distance-0.4.2-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:faebc1193cb17ed9b4ff0ca990896b79fbc43230c816e7db6900247557cb18fc", size = 480518 },
     { url = "https://files.pythonhosted.org/packages/1f/6f/c4201b1bc193f32a69dc60dfe417c7039d20e1449ad4de50d1c5627612fb/fast_geo_distance-0.4.2-cp312-cp312-musllinux_1_2_armv7l.whl", hash = "sha256:2bd2e70cfc74a656ffc92e99d92f0b0b81efd5faffd9bb3e177a1396f4334c2f", size = 562696 },
     { url = "https://files.pythonhosted.org/packages/df/ad/0e25aa8de24fb57dec98f602b2cb56937bf15e5dc3e3c068295c85d8146c/fast_geo_distance-0.4.2-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:dcc38166a84d3998419831aa9be20a1b8d3a1a076c01695a4ed5a22dd72cb18a", size = 486268 },
