@@ -1,54 +1,41 @@
 import os
 import glob
 import polars as pl
-import h3.api.basic_int as h3
+import h3ronpy.polars
 
-from typing import Tuple
+from dotenv import load_dotenv
+
+
+load_dotenv(override=True)
 
 
 DAY_FILTER = "2020-0[6, 7, 8, 9, 10]*.parquet"
-OUTPUT_FILE = "activities_class_b.csv"
-INPUT_PATH = "/media/pbusenius/BigData/AIS/simplified"
-
-
-def compute_h3_cell(values: Tuple[float]) -> int:
-    return h3.h3_to_parent(values[0], values[1])
+OUTPUT_FILE = "ais_activities.csv"
 
 
 def main():
-    queries = []
-    day_files = glob.glob(os.path.join(INPUT_PATH, DAY_FILTER))
-
-    for day_file in day_files:
-        queries.append(
-            pl.scan_parquet(
-                day_file,
-            )
-            .select(["MMSI", "h3_cell_rough", "LATITUDE", "LONGITUDE"])
-            .filter((pl.col("h3_cell_rough") != 0) & (not pl.col("is_class_a")))
-            .groupby("h3_cell_rough")
-            .agg(
-                pl.col("MMSI").n_unique().alias("MMSI_COUNT"),
-            )
-        )
-
-    queries = pl.collect_all(queries)
-    df = pl.concat(queries)
-
-    df = df.with_columns(
-        pl.col(
-            [
-                "h3_cell_rough",
-            ]
-        )
-        .apply(lambda x: compute_h3_cell((x, 5)))
-        .alias("h3_cell_rough"),
+    day_files = glob.glob(
+        os.path.join(os.getenv("AIS_SIMPLIFIED_DIRECTORY"), DAY_FILTER)
     )
 
-    df = df.groupby("h3_cell_rough").agg(pl.col("MMSI_COUNT").sum())
+    df = (
+        pl.scan_parquet(day_files, glob=True)
+        .select(["MMSI", "h3_cell_rough"])
+        .group_by("h3_cell_rough")
+        .agg(
+            pl.col("MMSI").n_unique().alias("MMSI_COUNT"),
+        )
+    ).collect(streaming=True)
 
-    df = df.with_columns(
-        pl.col("h3_cell_rough").apply(lambda x: f"{x:0x}").alias("h3_cell_rough"),
+    df = (
+        df.with_columns(pl.col("h3_cell_rough").h3.change_resolution(5).alias("h3"))
+        .group_by("h3")
+        .agg(pl.col("MMSI_COUNT").sum())
+        .with_columns(
+            pl.col("h3")
+            .map_elements(lambda x: f"{x:0x}", return_dtype=pl.String)
+            .alias("h3")
+        )
     )
 
     df.write_csv(OUTPUT_FILE)
