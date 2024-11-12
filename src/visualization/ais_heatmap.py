@@ -1,7 +1,7 @@
 import os
 import glob
 import polars as pl
-import h3ronpy.polars
+import h3ronpy.polars  # noqa: F401
 
 from dotenv import load_dotenv
 
