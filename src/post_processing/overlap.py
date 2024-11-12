@@ -8,12 +8,24 @@ DISTANCE_THRESHOLD = 20
 DDPI_FILE_OUTPUT = "ddpi_v2.geojson"
 
 
+def spatial_join(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    gdf = gdf.sjoin(gdf, how="left", predicate="intersects")
+    gdf = gdf.dissolve("ddpi_id_right")
+
+    gdf = gdf.reset_index().dissolve("ddpi_id_left")
+
+    gdf =  gdf.drop(["ddpi_id_right", "is_anchorage_right", "index_right"], axis=1).reset_index()
+
+    return gdf.rename(columns={"ddpi_id_left": "ddpi_id", "is_anchorage_left": "is_anchorage"})
+
+    
+
 def remove(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    ddpi_gdf = ddpi_gdf.sjoin(ddpi_gdf, how="left", predicate="intersects")
-    ddpi_gdf = ddpi_gdf.dissolve("ddpi_id_right")
+    number_of_ports = len(ddpi_gdf)
+    
+    ddpi_gdf = spatial_join(ddpi_gdf)
 
-    ddpi_gdf = ddpi_gdf.reset_index().dissolve("ddpi_id_left")
+    if number_of_ports == len(ddpi_gdf):
+        return ddpi_gdf
 
-    ddpi_gdf = ddpi_gdf.drop(["ddpi_id_right", "is_anchorage_right", "index_right"], axis=1).reset_index()
-
-    return ddpi_gdf.rename(columns={"ddpi_id_left": "ddpi_id", "is_anchorage_left": "is_anchorage"})
+    return remove(ddpi_gdf)
