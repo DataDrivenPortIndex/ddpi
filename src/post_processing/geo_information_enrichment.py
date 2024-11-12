@@ -93,6 +93,7 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         lambda x: build_wpi_distance_dict(calculate_poi_distance(x.geometry, wpi_gdf)),
         axis=1,
     )
+
     ddpi_gdf["city"] = ddpi_gdf.apply(
         lambda x: build_city_distance_dict(
             calculate_poi_distance(x.geometry, cities_gdf)

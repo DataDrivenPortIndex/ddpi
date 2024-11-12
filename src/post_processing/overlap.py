@@ -14,15 +14,18 @@ def spatial_join(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     gdf = gdf.reset_index().dissolve("ddpi_id_left")
 
-    gdf =  gdf.drop(["ddpi_id_right", "is_anchorage_right", "index_right"], axis=1).reset_index()
+    gdf = gdf.drop(
+        ["ddpi_id_right", "is_anchorage_right", "index_right"], axis=1
+    ).reset_index()
 
-    return gdf.rename(columns={"ddpi_id_left": "ddpi_id", "is_anchorage_left": "is_anchorage"})
+    return gdf.rename(
+        columns={"ddpi_id_left": "ddpi_id", "is_anchorage_left": "is_anchorage"}
+    )
 
-    
 
 def remove(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     number_of_ports = len(ddpi_gdf)
-    
+
     ddpi_gdf = spatial_join(ddpi_gdf)
 
     if number_of_ports == len(ddpi_gdf):
