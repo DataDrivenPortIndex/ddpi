@@ -74,6 +74,7 @@ def reduce_poi_gdf(poi_gdf, ddpi_gdf):
 
 
 def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    ddpi_gdf = ddpi_gdf.to_crs("EPSG:3857")
     buffered_ddpi_gdf = ddpi_gdf.copy()
     buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(
         DDPI_BUFFER / 111111
@@ -98,5 +99,7 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         ),
         axis=1,
     )
+
+    ddpi_gdf = ddpi_gdf.to_crs("epsg:4326")
 
     return ddpi_gdf
