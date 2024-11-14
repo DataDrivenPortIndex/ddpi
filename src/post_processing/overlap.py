@@ -23,12 +23,20 @@ def spatial_join(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     )
 
 
+def set_ddpi_id(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    gdf["ddpi_id"] = [i for i in range(len(gdf))]
+
+    return gdf
+
+
 def remove(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     number_of_ports = len(ddpi_gdf)
 
     ddpi_gdf = spatial_join(ddpi_gdf)
 
     if number_of_ports == len(ddpi_gdf):
+        ddpi_gdf = set_ddpi_id(ddpi_gdf)
+
         return ddpi_gdf
 
     return remove(ddpi_gdf)
