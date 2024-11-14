@@ -106,6 +106,7 @@ def main():
     export.as_csv(gdf, "test.csv")
     export.as_h3_csv(gdf, "test_h3.csv", 10)
     export.as_csv(gdf_country_code, "test_country_code.csv")
+    export.as_geojson(gdf, "ddpi.geojson")
 
 
 if __name__ == "__main__":
