@@ -12,12 +12,12 @@ This project aims to create a comprehensive, data-driven database of internation
     * A unique identification number.
     * Port name.
     * Polygon representing port boundaries.
- - Distinguishing Ports and Berths: Develop methods to differentiate between entire ports and individual berths within those ports.
+ - Distinguishing Ports and Anchorages: Develop methods to differentiate between entire ports and individual berths within those ports.
  - Future Extensions: Explore the possibility of extracting additional properties such as berth recognition and port draught.
 
 ![ddpi](static/images/ddpi.png)
 
-## How to DDPI
+## Build DDPI
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
