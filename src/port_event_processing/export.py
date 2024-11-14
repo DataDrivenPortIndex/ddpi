@@ -1,3 +1,4 @@
+import os.path
 import geopandas as gpd
 
 from h3ronpy.pandas.vector import geodataframe_to_cells
@@ -18,3 +19,11 @@ def as_h3_csv(gdf: gpd.GeoDataFrame, file_name: str, resolution: int):
 
 def as_csv(gdf: gpd.GeoDataFrame, file_name: str):
     gdf.to_csv(file_name, index=False)
+
+
+def as_geojson(gdf: gpd.GeoDataFrame, file_name: str):
+
+    if os.path.isfile(file_name):
+        os.remove(file_name)
+
+    gdf.to_file(file_name, driver="GeoJson")
