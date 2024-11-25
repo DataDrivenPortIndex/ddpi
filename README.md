@@ -24,7 +24,7 @@ This project is designed as a robust foundation for creating an accurate and det
    - A polygon representing the port's boundaries.
 
 4. **Port and Anchorage Differentiation**  
-   Develop methods to distinguish between entire ports and individual berths within those ports, as well as differentiate anchorages.
+   Develop methods to distinguish between entire ports and anchorages.
 
 ### Future Extensions:
 - **Berth Recognition**  
