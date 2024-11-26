@@ -2,7 +2,7 @@
 
 ## Overview
 
-The [**Country & City Enrichment** ](../src/post_processing/geo_information_enrichment.py) component of the **DDPI** (Data-Driven Port Index) system enhances the dataset by associating ports with their corresponding countries and cities. This is achieved by utilizing a list of global country polygons and a list of major cities around the world. Ports are enriched with geographical context, allowing for better analysis and understanding of maritime operations. This enrichment process provides a clearer link between ports and their geographical locations, contributing to more insightful analysis.
+The [**Country & City & WPI Enrichment** ](../src/post_processing/geo_information_enrichment.py) component of the **DDPI** (Data-Driven Port Index) system enhances the dataset by associating ports with their corresponding countries and cities. This is achieved by utilizing a list of global country polygons and a list of major cities around the world. Ports are enriched with geographical context, allowing for better analysis and understanding of maritime operations. This enrichment process provides a clearer link between ports and their geographical locations, contributing to more insightful analysis.
 
 ---
 
@@ -22,6 +22,13 @@ The **City Assignment** process involves assigning nearby cities to each port ba
 - **Port Polygon and City Proximity**: The system generates five points on the polygon of the port and calculates the distance from each point to all cities in the city list.
 - **Distance Calculation**: The system calculates the distance from each of the five points to all possible cities and identifies the 10 cities with the smallest distance.
 - **City Assignment**: If the distance between a city and a port is below a predefined threshold, the city is assigned to the port. This process is repeated for all ports in the dataset.
+
+### 1. **WPI Assignment**: 
+
+The **WPI Assignment** process involves mapping each port to its respective WPI by checking whether the port's geographic location (polygon) lies within the polygon of a specific WPI port. The key steps include:
+- **WPI Polygon Dataset**: A [dataset](../data/wpi.geojson)  of polygons representing the boundaries of each WPI port is used.
+- **Port Polygon Matching**: For each port, the polygon of the port is checked against the polygons of each WPI port.
+- **WPI Assignment**: If the port polygon lies within the WPI polygon, the corresponding WPI is assigned to the port.
 
 
 
