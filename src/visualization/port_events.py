@@ -1,25 +1,28 @@
 import os
 import polars as pl
-import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
 
 sns.set_style("darkgrid")
 
 MMSI_WANTED = 229600000
-INPUT_DIRECTORY = "data/simplified_ais"
 DATE = "2020-01-1[8-9]"
 
 
-def get_messages(mmsi: str) -> pd.DataFrame:
-    df = pl.read_parquet(os.path.join(INPUT_DIRECTORY, f"{DATE}*.parquet"))
-    # df = pd.read_parquet(os.path.join(INPUT_DIRECTORY, f"{DATE}.parquet"))
-    df = df.to_pandas()
+def get_messages(mmsi: str) -> pl.DataFrame:
+    input_directory = os.getenv("AIS_SIMPLIFIED_DIRECTORY")
+    df = pl.read_parquet(os.path.join(input_directory, f"{DATE}*.parquet"))
 
-    return df[df["MMSI"] == MMSI_WANTED]
+    df = df.filter(pl.col("MMSI")== mmsi)
+
+    return df
 
 
-def plot_column(column: str, df: pd.DataFrame, name: str, label=""):
+def plot_column(column: str, df: pl.DataFrame, name: str, label=""):
+    # df = df.to_pandas()
     # setting the dimensions of the plot
     fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -38,8 +41,10 @@ def plot_column(column: str, df: pd.DataFrame, name: str, label=""):
 def main():
     df = get_messages(MMSI_WANTED)
 
-    df["DRIFT"] = (df["COG"].abs() - df["TRUEHEADING"].abs()).abs()
-
+    df = df.with_columns(
+        (pl.col("COG").abs().sub(pl.col("TRUEHEADING").abs())).abs().alias("DRIFT"),
+    )
+    
     plot_column("COG", df, "cog", "course over ground (in degree)")
     plot_column("SOG", df, "sog", "speed over ground (in knots/hour)")
     plot_column("DRIFT", df, "drift", "drift (in degree)")
@@ -48,7 +53,16 @@ def main():
     plot_column("ROT", df, "rot", "rate of turn (in degree/minute)")
     plot_column("NAVSTATUSCODE", df, "nav_status", "navigation status code")
 
-    df[["TIMESTAMPUTC", "NAVSTATUSCODE"]].to_csv(f"{MMSI_WANTED}.csv")
+    df = df.group_by_dynamic(
+        "TIMESTAMPUTC",
+        every="15m",
+        period="3h",
+        group_by="MMSI",
+    ).agg(
+        pl.col("h3_cell").n_unique().alias("NUMBER_OF_H3_CELLS")
+    )
+
+    plot_column("NUMBER_OF_H3_CELLS", df, "number_of_h3_cells", "number of h3 cells")
 
 
 if __name__ == "__main__":
