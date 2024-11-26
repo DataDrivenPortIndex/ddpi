@@ -22,7 +22,6 @@ def get_messages(mmsi: str) -> pl.DataFrame:
 
 
 def plot_column(column: str, df: pl.DataFrame, name: str, label=""):
-    # df = df.to_pandas()
     # setting the dimensions of the plot
     fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -53,6 +52,7 @@ def main():
     plot_column("ROT", df, "rot", "rate of turn (in degree/minute)")
     plot_column("NAVSTATUSCODE", df, "nav_status", "navigation status code")
 
+    # aggregate h3 cells 
     df = df.group_by_dynamic(
         "TIMESTAMPUTC",
         every="15m",
