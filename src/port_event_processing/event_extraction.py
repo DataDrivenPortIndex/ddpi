@@ -92,7 +92,7 @@ def process_day(day_file: str) -> pl.LazyFrame:
             .then(True)
             .otherwise(False)
             .cast(pl.UInt8)
-            .alias("rate_of_turn_event"),
+            .alias("no_rate_of_turn_event"),
             pl.when(pl.col("DESTINATION").len() >= 2)
             .then(True)
             .otherwise(False)
