@@ -53,7 +53,7 @@ def main():
     plot_column("NAVSTATUSCODE", df, "nav_status", "navigation status code")
 
     # aggregate h3 cells 
-    df = df.group_by_dynamic(
+    df_no_movement = df.group_by_dynamic(
         "TIMESTAMPUTC",
         every="15m",
         period="3h",
@@ -62,7 +62,19 @@ def main():
         pl.col("h3_cell").n_unique().alias("NUMBER_OF_H3_CELLS")
     )
 
-    plot_column("NUMBER_OF_H3_CELLS", df, "number_of_h3_cells", "number of h3 cells")
+    plot_column("NUMBER_OF_H3_CELLS", df_no_movement, "no_movement_event", "number of h3 cells")
+
+    # affregate destinations
+    df_destination_changed = df.group_by_dynamic(
+        "TIMESTAMPUTC",
+        every="15m",
+        period="3h",
+        group_by="MMSI",
+    ).agg(
+        pl.col("DESTINATION").n_unique().sub(1).alias("DESTINATION_CHANGED")
+    )
+
+    plot_column("DESTINATION_CHANGED", df_destination_changed, "destination_changed", "destination change")
 
 
 if __name__ == "__main__":
