@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Country & City Enrichment** component of the **DDPI** (Data-Driven Port Index) system enhances the dataset by associating ports with their corresponding countries and cities. This is achieved by utilizing a list of global country polygons and a list of major cities around the world. Ports are enriched with geographical context, allowing for better analysis and understanding of maritime operations. This enrichment process provides a clearer link between ports and their geographical locations, contributing to more insightful analysis.
+The [**Country & City Enrichment** ](../src/post_processing/geo_information_enrichment.py) component of the **DDPI** (Data-Driven Port Index) system enhances the dataset by associating ports with their corresponding countries and cities. This is achieved by utilizing a list of global country polygons and a list of major cities around the world. Ports are enriched with geographical context, allowing for better analysis and understanding of maritime operations. This enrichment process provides a clearer link between ports and their geographical locations, contributing to more insightful analysis.
 
 ---
 
