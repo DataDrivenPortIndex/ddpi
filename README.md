@@ -12,7 +12,7 @@ This project is designed as a robust foundation for creating an accurate and det
 
 ### Core Goals:
 1. **Port Clustering**  
-   Detect recurring patterns [patterns](doc/port_events/) in AIS data—such as ship arrivals, departures, or common movement patterns—that signal the presence of ports or port-related facilities.
+   Detect recurring [patterns](doc/port_events/) in AIS data—such as ship arrivals, departures, or common movement patterns—that signal the presence of ports or port-related facilities.
 
 2. **Port Identification**  
    Use clustering algorithms to group detected events into distinct port clusters.
