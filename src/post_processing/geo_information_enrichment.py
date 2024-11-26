@@ -34,7 +34,7 @@ def build_city_distance_dict(poi_gdf):
     ]
 
 
-def calculate_poi_distance(port_point, poi_gdf):
+def calculate_poi_distance(port_point, poi_gdf: gpd.GeoDataFrame):
     poi_points = [(point.y, point.x) for point in poi_gdf.geometry.to_list()]
 
     poi_list = []
@@ -64,7 +64,7 @@ def split_port_polygon_into_n_sepments(port_polygon, n=5):
     return points
 
 
-def reduce_poi_gdf(poi_gdf, ddpi_gdf):
+def reduce_poi_gdf(poi_gdf: gpd.GeoDataFrame, ddpi_gdf: gpd.GeoDataFrame):
     negative_gdf = poi_gdf.copy()
 
     for _, row in ddpi_gdf.iterrows():
