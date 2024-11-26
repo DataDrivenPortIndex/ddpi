@@ -19,7 +19,7 @@ The **Country Assignment** process involves mapping each port to its respective 
 
 The **City Assignment** process involves assigning nearby cities to each port based on their proximity. The key steps include:
 - **City List**: A dataset of major cities around the world is used. Each city is represented by a geographical coordinate (latitude and longitude).
-- **Port Polygon and City Proximity**: The system generates five random points within the polygon of the port and calculates the distance from each point to all cities in the city list.
+- **Port Polygon and City Proximity**: The system generates five points on the polygon of the port and calculates the distance from each point to all cities in the city list.
 - **Distance Calculation**: The system calculates the distance from each of the five points to all possible cities and identifies the 10 cities with the smallest distance.
 - **City Assignment**: If the distance between a city and a port is below a predefined threshold, the city is assigned to the port. This process is repeated for all ports in the dataset.
 
