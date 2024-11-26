@@ -1,13 +1,6 @@
 import geopandas as gpd
 
 
-DDPI_FILE = "ddpi.geojson"
-CITIES_FILE = "cities.json"
-DISTANCE_FILE = "hub_line_distance.geojson"
-DISTANCE_THRESHOLD = 20
-DDPI_FILE_OUTPUT = "ddpi_v2.geojson"
-
-
 def spatial_join(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     gdf = gdf.sjoin(gdf, how="left", predicate="intersects")
     gdf = gdf.dissolve("ddpi_id_right")

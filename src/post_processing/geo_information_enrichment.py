@@ -5,7 +5,6 @@ import fast_geo_distance
 
 
 DDPI_BUFFER = 15000
-DDPI_FILE = "data/ddpi_v2.1.geojson"
 WPI_FILE = "data/wpi.geojson"
 CITY_FILE = "data/cities.geojson"
 
