@@ -22,7 +22,6 @@ def as_csv(gdf: gpd.GeoDataFrame, file_name: str):
 
 
 def as_geojson(gdf: gpd.GeoDataFrame, file_name: str):
-
     if os.path.isfile(file_name):
         os.remove(file_name)
 
