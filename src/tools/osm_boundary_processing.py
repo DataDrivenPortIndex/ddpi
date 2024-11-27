@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import pandas as pd
 import geopandas as gpd
 
@@ -47,7 +48,10 @@ def main():
         axis=1,
     )
 
-    gdf.to_file("test.geojson", driver="GeoJson")
+    # gdf.to_file("test.geojson", driver="GeoJson")
+
+    for i, x in enumerate(np.array_split(gdf, 3)):
+        x.to_file(f"data/countries_part_{i+1}.geojson", driver="GeoJson")
 
 
 if __name__ == "__main__":
