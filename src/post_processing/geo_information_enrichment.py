@@ -1,3 +1,4 @@
+import glob
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -9,6 +10,17 @@ COUNTRY_FILE = "data/[1,2,3].geojson"
 WPI_FILE = "data/wpi.geojson"
 CITY_FILE = "data/cities.geojson"
 
+
+def read_geojson_parts(pattern: str) -> gpd.GeoDataFrame:
+    gdf_list = []
+
+    for geojson_part in glob.glob(pattern):
+        tmp_gdf = gpd.read_file(geojson_part)
+
+        gdf_list.append(tmp_gdf)
+
+    return pd.concat(gdf_list)       
+                                                                                                                             
 
 def build_wpi_distance_dict(poi_gdf):
     poi_gdf = poi_gdf.drop_duplicates(subset=["World Port Index Number"])
