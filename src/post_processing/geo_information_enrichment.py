@@ -5,7 +5,7 @@ import geopandas as gpd
 import fast_geo_distance
 
 
-DDPI_BUFFER = 15000
+DDPI_BUFFER_IN_METER = 50000
 COUNTRY_FILE = "data/countries_part*.geojson"
 WPI_FILE = "data/wpi.geojson"
 CITY_FILE = "data/cities.geojson"
@@ -57,7 +57,7 @@ def calculate_poi_distance(port_point, poi_gdf: gpd.GeoDataFrame):
             point.y, point.x, poi_points
         )
 
-        tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_BUFFER]
+        tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_BUFFER_IN_METER]
 
         poi_list.append(tmp_poi_gdf)
 
@@ -87,15 +87,18 @@ def reduce_poi_gdf(poi_gdf: gpd.GeoDataFrame, ddpi_gdf: gpd.GeoDataFrame):
 
 def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     ddpi_gdf = ddpi_gdf.to_crs("EPSG:3857")
-    # buffered_ddpi_gdf = ddpi_gdf.copy()
-    # buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(
-    #     DDPI_BUFFER / 111111
-    # )
+    buffered_ddpi_gdf = ddpi_gdf.copy()
+    buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(
+        DDPI_BUFFER_IN_METER
+    )
+
+    buffered_ddpi_gdf = buffered_ddpi_gdf.to_crs("epsg:4326")
+    buffered_ddpi_gdf.to_file("buffered_ddpi.geojson", driver="GeoJson")
 
     # read wpi-file and reduce
     wpi_gdf = gpd.read_file(WPI_FILE)
     wpi_gdf["World Port Index Number"] = wpi_gdf["World Port Index Number"].astype(int)
-    # wpi_gdf = reduce_poi_gdf(wpi_gdf, buffered_ddpi_gdf)
+    wpi_gdf = reduce_poi_gdf(wpi_gdf, buffered_ddpi_gdf)
 
     ddpi_gdf["wpi"] = ddpi_gdf.apply(
         lambda x: build_wpi_distance_dict(calculate_poi_distance(x.geometry, wpi_gdf)),
@@ -104,7 +107,9 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     # read city-file and reduce
     cities_gdf = gpd.read_file(CITY_FILE)
-    # cities_gdf = reduce_poi_gdf(cities_gdf, buffered_ddpi_gdf)
+    cities_gdf = reduce_poi_gdf(buffered_ddpi_gdf, cities_gdf)
+
+    print(cities_gdf)
 
     ddpi_gdf["city"] = ddpi_gdf.apply(
         lambda x: build_city_distance_dict(
