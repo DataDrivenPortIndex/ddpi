@@ -6,7 +6,7 @@ import fast_geo_distance
 
 
 DDPI_BUFFER = 15000
-COUNTRY_FILE = "data/[1,2,3].geojson"
+COUNTRY_FILE = "data/countries_part*.geojson"
 WPI_FILE = "data/wpi.geojson"
 CITY_FILE = "data/cities.geojson"
 
@@ -113,7 +113,9 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         axis=1,
     )
 
-    # country
+    # country enrichment
+    country_gdf = read_geojson_parts(COUNTRY_FILE)
+    
     # country_gdf = gpd.read_file(COUNTRY_FILE)
     # print(country_gdf)
 
