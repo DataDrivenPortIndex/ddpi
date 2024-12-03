@@ -100,12 +100,11 @@ def main():
     # DDPI-Aggregation ##################################################################################
     gdf = overlap.remove(gdf)
 
-    gdf_country_code = geo_information_enrichment.enrich(gdf)
+    gdf = geo_information_enrichment.enrich(gdf)
 
     # DDPI Export #######################################################################################
-    export.as_csv(gdf, "test.csv")
-    export.as_h3_csv(gdf, "test_h3.csv", 10)
-    export.as_csv(gdf_country_code, "test_country_code.csv")
+    # export.as_csv(gdf, "ddpi.csv")
+    # export.as_h3_csv(gdf, "test_h3.csv", 10)
     export.as_geojson(gdf, "ddpi.geojson")
 
 
