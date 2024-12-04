@@ -11,7 +11,7 @@ The [**Country & City & WPI Enrichment** ](../src/post_processing/geo_informatio
 ### 1. **Country Assignment**: 
 
 The **Country Assignment** process involves mapping each port to its respective country by checking whether the port's geographic location (polygon) lies within the polygon of a specific country. The key steps include:
-- **Country Polygon Dataset**: A [dataset](../data/world.geojson)  of polygons representing the boundaries of each country is used.
+- **Country Polygon Dataset**: A [dataset](../data/countries_part_1.geojson)  of polygons representing the boundaries of each country is used.
 - **Port Polygon Matching**: For each port, the polygon of the port is checked against the polygons of each country.
 - **Country Assignment**: If the port polygon lies within the country polygon, the corresponding country is assigned to the port.
 
