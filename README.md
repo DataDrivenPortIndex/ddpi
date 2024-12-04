@@ -21,7 +21,10 @@ This project is designed as a robust foundation for creating an accurate and det
    For each identified port cluster, generate key attributes:
    - A unique identification number.
    - Port name.
+   - Cities: A list of cities associated with the port. Multiple cities can be added if the exact geographic association cannot be determined.
+   - Country: The nation where the port is located.
    - A polygon representing the port's boundaries.
+   - WPI: The World Port Index (WPI) number, where available, offering a globally recognized reference for port identification.
 
 4. **Port and Anchorage Differentiation**  
    Develop methods to distinguish between entire ports and anchorages.
