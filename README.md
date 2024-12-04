@@ -80,4 +80,4 @@ uv run main.py
 
 ---
 
-DDPI is a step toward building a precise and scalable port database for global shipping and logistics. This platform is designed to evolve, enabling more granular analysis and operational insights into maritime transport hubs.
+DDPI is a step toward building a precise and scalable port database. This platform is designed to evolve, enabling more granular analysis and operational insights into maritime transport hubs.
