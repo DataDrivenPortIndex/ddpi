@@ -39,7 +39,7 @@ This project is designed as a robust foundation for creating an accurate and det
     - The number of ships entering and leaving the port.
     - Classification of ships by type (e.g., container, tanker, bulk carrier, passenger).
     - Aggregated statistics to identify trends in port activity and shipping patterns.
-    
+
 ---
 
 ## Getting Started
@@ -50,6 +50,12 @@ Ensure that the necessary tools and dependencies are installed.
 #### Install the Build System:
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+#### Clone the Repository:
+```bash
+git clone https://github.com/DataDrivenPortIndex/ddpi.git
+cd ddpi
 ```
 
 #### Set Environment Variables
