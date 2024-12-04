@@ -36,8 +36,6 @@ def build_wpi_distance_dict(poi_gdf):
 
 
 def build_city_distance_dict(poi_gdf):
-    # poi_gdf = poi_gdf.drop_duplicates(subset=["name"])
-    print(poi_gdf)
     city_name = poi_gdf["name"].to_list()
     distance = poi_gdf["distance"].to_list()
 
@@ -47,7 +45,7 @@ def build_city_distance_dict(poi_gdf):
     ]
 
 
-def calculate_poi_distance(port_point, poi_gdf: gpd.GeoDataFrame):
+def calculate_poi_distance(port_point, poi_gdf: gpd.GeoDataFrame, drop_duplicates: str = ""):
     poi_points = [(point.y, point.x) for point in poi_gdf.geometry.to_list()]
 
     poi_list = []
@@ -57,12 +55,14 @@ def calculate_poi_distance(port_point, poi_gdf: gpd.GeoDataFrame):
         tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(
             point.y, point.x, poi_points
         )
-        
         tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_DISTANCE_THRESHOLD]
 
         poi_list.append(tmp_poi_gdf)
 
-    poi_gdf = pd.concat(poi_list).drop_duplicates(keep=False)
+    poi_gdf = pd.concat(poi_list)
+
+    if drop_duplicates:
+        poi_gdf = poi_gdf.drop_duplicates(subset=[drop_duplicates])
 
     return poi_gdf.nsmallest(10, columns="distance")
 
@@ -87,16 +87,15 @@ def reduce_poi_gdf(poi_gdf: gpd.GeoDataFrame, ddpi_gdf: gpd.GeoDataFrame):
 
 
 def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    # create buffered ddpi to only get poi in port areas
     buffered_ddpi_gdf = ddpi_gdf.copy()
     buffered_ddpi_gdf = buffered_ddpi_gdf.to_crs("EPSG:3857")
     buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(
         DDPI_BUFFER_IN_METER
     )
-
     buffered_ddpi_gdf = buffered_ddpi_gdf.to_crs("epsg:4326")
-    # buffered_ddpi_gdf.to_file("buffered_ddpi.geojson", driver="GeoJson")
 
-    # read wpi-file and reduce
+    # rwpi enrichment
     wpi_gdf = gpd.read_file(WPI_FILE)
     wpi_gdf["World Port Index Number"] = wpi_gdf["World Port Index Number"].astype(int)
     wpi_gdf = reduce_poi_gdf(wpi_gdf, buffered_ddpi_gdf)
@@ -106,22 +105,21 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         axis=1,
     )
 
-    # read city-file and reduce
+    # city enrichment
     cities_gdf = gpd.read_file(CITY_FILE)
     cities_gdf = reduce_poi_gdf(cities_gdf, buffered_ddpi_gdf)
     ddpi_gdf["city"] = ddpi_gdf.apply(
         lambda x: build_city_distance_dict(
-            calculate_poi_distance(x.geometry, cities_gdf)
+            calculate_poi_distance(x.geometry, cities_gdf, "name")
         ),
         axis=1,
     )
 
-
-    ddpi_gdf = ddpi_gdf.to_crs("epsg:4326")
-
     # country enrichment
     country_gdf = read_geojson_parts(COUNTRY_FILE)
     ddpi_gdf = gpd.sjoin(ddpi_gdf, country_gdf, how="left", predicate="intersects")
+
+    ddpi_gdf = ddpi_gdf.drop(["name_en", "index_right"], axis=1)
 
 
     return ddpi_gdf
