@@ -97,14 +97,13 @@ def main():
         "/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv"
     )
 
-    # DDPI-Aggregation ##################################################################################
+    # DDPI-Cleaning #####################################################################################
     gdf = overlap.remove(gdf)
 
+    # DDPI-Enrichment ###################################################################################
     gdf = geo_information_enrichment.enrich(gdf)
 
     # DDPI Export #######################################################################################
-    # export.as_csv(gdf, "ddpi.csv")
-    # export.as_h3_csv(gdf, "test_h3.csv", 10)
     export.as_geojson(gdf, "ddpi.geojson")
 
 

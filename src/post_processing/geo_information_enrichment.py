@@ -20,8 +20,8 @@ def read_geojson_parts(pattern: str) -> gpd.GeoDataFrame:
 
         gdf_list.append(tmp_gdf)
 
-    return pd.concat(gdf_list)       
-                                                                                                                             
+    return pd.concat(gdf_list)
+
 
 def build_wpi_distance_dict(poi_gdf):
     poi_gdf = poi_gdf.drop_duplicates(subset=["World Port Index Number"])
@@ -40,12 +40,13 @@ def build_city_distance_dict(poi_gdf):
     distance = poi_gdf["distance"].to_list()
 
     return [
-        {"name": city_name[i], "distance": distance[i]}
-        for i in range(len(city_name))
+        {"name": city_name[i], "distance": distance[i]} for i in range(len(city_name))
     ]
 
 
-def calculate_poi_distance(port_point, poi_gdf: gpd.GeoDataFrame, drop_duplicates: str = ""):
+def calculate_poi_distance(
+    port_point, poi_gdf: gpd.GeoDataFrame, drop_duplicates: str = ""
+):
     poi_points = [(point.y, point.x) for point in poi_gdf.geometry.to_list()]
 
     poi_list = []
@@ -120,6 +121,5 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     ddpi_gdf = gpd.sjoin(ddpi_gdf, country_gdf, how="left", predicate="intersects")
 
     ddpi_gdf = ddpi_gdf.drop(["name_en", "index_right"], axis=1)
-
 
     return ddpi_gdf

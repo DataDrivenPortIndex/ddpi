@@ -9,6 +9,7 @@ import geopandas as gpd
 COUNTRIES_FILE = "data/countries.geojson"
 NUMBER_OF_FILE_PARTS = 5
 
+
 def extract_iso_code(tags: str) -> str:
     x = json.loads(tags)
 
@@ -52,7 +53,7 @@ def main():
     # gdf.to_file("test.geojson", driver="GeoJson")
 
     for i, x in enumerate(np.array_split(gdf, NUMBER_OF_FILE_PARTS)):
-        file_name = f"data/countries_part_{i+1}.geojson" 
+        file_name = f"data/countries_part_{i+1}.geojson"
         if os.path.isfile(file_name):
             os.remove(file_name)
         x.to_file(file_name, driver="GeoJson")
