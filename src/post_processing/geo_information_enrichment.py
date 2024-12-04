@@ -47,6 +47,7 @@ def build_city_distance_dict(poi_gdf):
 def calculate_poi_distance(
     port_point, poi_gdf: gpd.GeoDataFrame, drop_duplicates: str = ""
 ):
+    # TODO: reduce number of poi_points by joining them with the buffered port-polygon
     poi_points = [(point.y, point.x) for point in poi_gdf.geometry.to_list()]
 
     poi_list = []
@@ -96,7 +97,7 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     )
     buffered_ddpi_gdf = buffered_ddpi_gdf.to_crs("epsg:4326")
 
-    # rwpi enrichment
+    # wpi enrichment
     wpi_gdf = gpd.read_file(WPI_FILE)
     wpi_gdf["World Port Index Number"] = wpi_gdf["World Port Index Number"].astype(int)
     wpi_gdf = reduce_poi_gdf(wpi_gdf, buffered_ddpi_gdf)
