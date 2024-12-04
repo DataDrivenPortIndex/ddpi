@@ -5,6 +5,7 @@ import geopandas as gpd
 import fast_geo_distance
 
 
+DDPI_DISTANCE_THRESHOLD = 5000
 DDPI_BUFFER_IN_METER = 50000
 COUNTRY_FILE = "data/countries_part*.geojson"
 WPI_FILE = "data/wpi.geojson"
@@ -35,13 +36,13 @@ def build_wpi_distance_dict(poi_gdf):
 
 
 def build_city_distance_dict(poi_gdf):
-    poi_gdf = poi_gdf.drop_duplicates(subset=["name"])
+    # poi_gdf = poi_gdf.drop_duplicates(subset=["name"])
+    print(poi_gdf)
     city_name = poi_gdf["name"].to_list()
-    country_name = poi_gdf["country_name"].to_list()
     distance = poi_gdf["distance"].to_list()
 
     return [
-        {"name": city_name[i], "country": country_name[i], "distance": distance[i]}
+        {"name": city_name[i], "distance": distance[i]}
         for i in range(len(city_name))
     ]
 
@@ -56,8 +57,8 @@ def calculate_poi_distance(port_point, poi_gdf: gpd.GeoDataFrame):
         tmp_poi_gdf["distance"] = fast_geo_distance.batch_geodesic(
             point.y, point.x, poi_points
         )
-
-        tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_BUFFER_IN_METER]
+        
+        tmp_poi_gdf = tmp_poi_gdf[tmp_poi_gdf["distance"] <= DDPI_DISTANCE_THRESHOLD]
 
         poi_list.append(tmp_poi_gdf)
 
@@ -86,14 +87,14 @@ def reduce_poi_gdf(poi_gdf: gpd.GeoDataFrame, ddpi_gdf: gpd.GeoDataFrame):
 
 
 def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    ddpi_gdf = ddpi_gdf.to_crs("EPSG:3857")
     buffered_ddpi_gdf = ddpi_gdf.copy()
+    buffered_ddpi_gdf = buffered_ddpi_gdf.to_crs("EPSG:3857")
     buffered_ddpi_gdf["geometry"] = buffered_ddpi_gdf["geometry"].buffer(
         DDPI_BUFFER_IN_METER
     )
 
     buffered_ddpi_gdf = buffered_ddpi_gdf.to_crs("epsg:4326")
-    buffered_ddpi_gdf.to_file("buffered_ddpi.geojson", driver="GeoJson")
+    # buffered_ddpi_gdf.to_file("buffered_ddpi.geojson", driver="GeoJson")
 
     # read wpi-file and reduce
     wpi_gdf = gpd.read_file(WPI_FILE)
@@ -107,10 +108,7 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     # read city-file and reduce
     cities_gdf = gpd.read_file(CITY_FILE)
-    cities_gdf = reduce_poi_gdf(buffered_ddpi_gdf, cities_gdf)
-
-    print(cities_gdf)
-
+    cities_gdf = reduce_poi_gdf(cities_gdf, buffered_ddpi_gdf)
     ddpi_gdf["city"] = ddpi_gdf.apply(
         lambda x: build_city_distance_dict(
             calculate_poi_distance(x.geometry, cities_gdf)
