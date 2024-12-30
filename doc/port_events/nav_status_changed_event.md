@@ -18,4 +18,4 @@ The AIS `Nav Status` field uses integer codes to represent different navigation 
 
 
 ## Example
-![ais heatmap](../../static/images/nav_status.png)
+![nav_status_changed](../../static/images/nav_status.png)
