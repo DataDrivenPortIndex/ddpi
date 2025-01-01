@@ -37,11 +37,12 @@ def build_wpi_distance_dict(poi_gdf):
 
 def build_city_distance_dict(poi_gdf):
     city_name = poi_gdf["name"].to_list()
-    country = poi_gdf["country_name"].to_list()    
+    country = poi_gdf["country_name"].to_list()
     distance = poi_gdf["distance"].to_list()
 
     return [
-        {"name": city_name[i], "country": country[i], "distance": distance[i]} for i in range(len(city_name))
+        {"name": city_name[i], "country": country[i], "distance": distance[i]}
+        for i in range(len(city_name))
     ]
 
 
