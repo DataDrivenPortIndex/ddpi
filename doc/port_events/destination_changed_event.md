@@ -6,4 +6,4 @@ The **destination_changed_event** is a type of port event within the DDPI system
 
 ## Example
 
-![destination_changed](../../static/images/destination_changed.png)
+![Destination Changed Visualization](../../static/images/destination_changed.png)

@@ -6,4 +6,4 @@ The **no_drift_event** is a type of port event within the DDPI system that ident
 
 ## Example
 
-![no_drift](../../static/images/no_drift.png)
+![No Drift Visualization](../../static/images/no_drift.png)
