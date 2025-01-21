@@ -83,6 +83,8 @@ def main():
         table, "AIS_VALIDATED_PORT_EVENTS_DIRECTORY"
     )
 
+    # TODO: check if directories exists
+
     print(table)
 
     # Data-Preparation ##################################################################################
