@@ -7,4 +7,4 @@ The **no_movement_event**  is a specialized port-related event within the DDPI s
 This event indicates prolonged stationary behavior, such as anchoring, mooring, or waiting within or near a port. By leveraging the precision of H3 cells, the event provides accurate and efficient detection of stationary periods, enabling better insights into vessel operations such as loading, unloading, or queueing for berthing. It also plays a crucial role in monitoring port traffic, analyzing congestion, and validating maritime activities.
 
 ## Example
-![ais heatmap](../../static/images/no_movement_event.png)
+![No Movement Visualization](../../static/images/no_movement_event.png)

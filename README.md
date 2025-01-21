@@ -34,7 +34,7 @@ This project is designed as a robust foundation for creating an accurate and det
   Identify individual berths within a port to achieve finer granularity.
 - **Port Characteristics**  
   Extract additional properties such as draught information, cargo handling capabilities, or other operational attributes.
-- **Ship Traffic Statistics**
+- **Ship Traffic Statistics**  
   Enable the visualization and analysis of ship traffic over a defined time period, including:
     - The number of ships entering and leaving the port.
     - Classification of ships by type (e.g., container, tanker, bulk carrier, passenger).
