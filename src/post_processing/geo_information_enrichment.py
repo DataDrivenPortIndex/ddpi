@@ -101,13 +101,6 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     )
     buffered_ddpi_gdf = buffered_ddpi_gdf.to_crs("epsg:4326")
 
-    buffered_small_ddpi_gdf = ddpi_gdf.copy()
-    buffered_small_ddpi_gdf = buffered_small_ddpi_gdf.to_crs("EPSG:3857")
-    buffered_small_ddpi_gdf["geometry"] = buffered_small_ddpi_gdf["geometry"].buffer(
-        DDPI_BUFFER_IN_METER
-    )
-    buffered_small_ddpi_gdf = buffered_small_ddpi_gdf.to_crs("epsg:4326")
-
     # wpi enrichment
     wpi_gdf = gpd.read_file(WPI_FILE)
     wpi_gdf["World Port Index Number"] = wpi_gdf["World Port Index Number"].astype(int)
