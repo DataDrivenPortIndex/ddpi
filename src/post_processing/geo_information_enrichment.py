@@ -124,6 +124,6 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     country_gdf = read_geojson_parts(COUNTRY_FILE)
     ddpi_gdf = gpd.sjoin(ddpi_gdf, country_gdf, how="left", predicate="intersects")
 
-    ddpi_gdf = ddpi_gdf.drop(["name_en", "index_right"], axis=1)
+    ddpi_gdf = ddpi_gdf.drop(["name_en", "index_right", "osm_id"], axis=1)
 
     return ddpi_gdf
