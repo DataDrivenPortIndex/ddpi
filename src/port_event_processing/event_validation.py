@@ -1,10 +1,10 @@
 import polars as pl
 
-MIN_DAYS = 30
+MIN_DAYS = 10
 EVENT_THRESHOLD = 0.35
 PORT_THRESHOLD = 0.7
 ANCHORAGE_THRESHOLD = 0.7
-MICROSECONDS_IN_DAY = 86400000
+MICROSECONDS_IN_DAY = 864000
 MIN_NUMBER_OF_VESSELS = 2
 NO_SOG_EVENT_THRESHOLD = 0
 NO_MOVEMENT_EVENT_THRESHOLD = 0
@@ -27,7 +27,7 @@ def validate(port_events_input_file: str, port_events_output_file: str):
         pl.col("is_moored_event").mean(),
         pl.col("is_anchored_event").mean(),
         pl.col("drifting_event").mean(),
-        pl.col("rate_of_turn_event").mean(),
+        pl.col("no_rate_of_turn_event").mean(),
         pl.col("destination_changed_event").mean(),
         pl.col("draught_changed_event").mean(),
         pl.col("towing_event").mean(),
@@ -46,6 +46,7 @@ def validate(port_events_input_file: str, port_events_output_file: str):
     ).with_columns(
         (
             pl.col("no_sog_event")
+            .add(pl.col("no_rate_of_turn_event"))
             .add(pl.col("no_movement_event"))
             .add(pl.col("drifting_event"))
             .add(pl.col("draught_changed_event"))
