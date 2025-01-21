@@ -6,8 +6,7 @@ import fast_geo_distance
 
 
 DDPI_DISTANCE_THRESHOLD = 5000
-DDPI_BUFFER_IN_METER = 50000
-DDPI_SMAL_BUFFER_IN_METER = 2000
+DDPI_BUFFER_IN_METER = 5000
 COUNTRY_FILE = "data/countries_part*.geojson"
 WPI_FILE = "data/wpi.geojson"
 CITY_FILE = "data/cities.geojson"
@@ -49,7 +48,7 @@ def build_city_distance_dict(poi_gdf):
 def calculate_poi_distance(
     port_point, poi_gdf: gpd.GeoDataFrame, drop_duplicates: str = ""
 ):
-    # TODO: reduce number of poi_points by joining them with the buffered port-polygon
+    # reduce number of poi candidates
     poi_gdf = poi_gdf[poi_gdf.within(port_point)]
 
     poi_points = [(point.y, point.x) for point in poi_gdf.geometry.to_list()]
@@ -104,16 +103,16 @@ def enrich(ddpi_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     # wpi enrichment
     wpi_gdf = gpd.read_file(WPI_FILE)
     wpi_gdf["World Port Index Number"] = wpi_gdf["World Port Index Number"].astype(int)
-    wpi_gdf = reduce_poi_gdf(wpi_gdf, buffered_ddpi_gdf)
+    # wpi_gdf = reduce_poi_gdf(wpi_gdf, buffered_ddpi_gdf)
 
-    ddpi_gdf["wpi"] = ddpi_gdf.apply(
+    ddpi_gdf["wpi"] = buffered_ddpi_gdf.apply(
         lambda x: build_wpi_distance_dict(calculate_poi_distance(x.geometry, wpi_gdf)),
         axis=1,
     )
 
     # city enrichment
     cities_gdf = gpd.read_file(CITY_FILE)
-    ddpi_gdf["city"] = ddpi_gdf.apply(
+    ddpi_gdf["city"] = buffered_ddpi_gdf.apply(
         lambda x: build_city_distance_dict(
             calculate_poi_distance(x.geometry, cities_gdf, "name")
         ),
