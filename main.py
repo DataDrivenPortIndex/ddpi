@@ -36,6 +36,9 @@ def simplification(input_directory: str, output_directory: str):
 
 def extraction(input_directory: str, output_directory: str, years: str):
     dfs = []
+    
+    if not os.path.exists:
+        os.mkdir(output_directory)
 
     for year in years:
         output_file = os.path.join(output_directory, f"port_events_{year}.parquet")
@@ -58,6 +61,9 @@ def extraction(input_directory: str, output_directory: str, years: str):
 
 
 def validation(input_directory: str, output_directory: str):
+    if not os.path.exists:
+        os.mkdir(output_directory)
+
     for port_event_file in tqdm(os.listdir(input_directory)):
         event_file_path = os.path.join(input_directory, port_event_file)
         validated_event_file_path = os.path.join(
@@ -82,8 +88,6 @@ def main():
     ais_validated_port_events_directory = get_enviroment_variable(
         table, "AIS_VALIDATED_PORT_EVENTS_DIRECTORY"
     )
-
-    # TODO: check if directories exists
 
     print(table)
 
