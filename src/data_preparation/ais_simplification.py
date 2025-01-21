@@ -122,9 +122,12 @@ def class_messages(df: pl.DataFrame, mode_config: Dict) -> pl.DataFrame:
 
 
 def simplifiy(day: str, output_directory: str):
+    if not os.path.exists:
+        os.mkdir(output_directory)
+        
     out_path = f"{os.path.join(output_directory, os.path.basename(day))}.parquet"
     if not os.path.isfile(out_path):
-        df = pl.read_parquet(f"{day}/*.parquet", columns=AIS_COLUMNS)
+        df = pl.read_parquet(f"{day}/*type_cast.parquet", columns=AIS_COLUMNS)
 
         # filter and combine class a and class b messages
         class_a_df = class_messages(df, CLASS_A_MESSAGES)
