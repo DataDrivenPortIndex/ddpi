@@ -36,7 +36,7 @@ def simplification(input_directory: str, output_directory: str):
 
 def extraction(input_directory: str, output_directory: str, years: str):
     dfs = []
-    
+
     if not os.path.exists:
         os.mkdir(output_directory)
 
