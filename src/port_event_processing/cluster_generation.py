@@ -1,3 +1,4 @@
+import glob
 import pandas as pd
 import geopandas as gpd
 
@@ -23,8 +24,9 @@ def cluster_points(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return gdf
 
 
-def get_data_from_csv(file: str) -> gpd.GeoDataFrame:
-    df = pd.read_csv(file)
+def get_data_from_csv(directory: str) -> gpd.GeoDataFrame:
+    df = pd.concat([pd.read_csv(file) for file in glob.glob(f"{directory}/*.csv")])
+    # df = pd.read_csv(file)
 
     df = df[
         (df["port_score"] >= PORT_THRESHOLD)
@@ -80,8 +82,8 @@ def filter_port_type(
     return gdf[gdf[field] >= threshold].copy()
 
 
-def generate(port_events_file: str) -> gpd.GeoDataFrame:
-    gdf = get_data_from_csv(port_events_file)
+def generate(validated_port_events_directory: str) -> gpd.GeoDataFrame:
+    gdf = get_data_from_csv(validated_port_events_directory)
 
     # process ports #####################################################################################
     port_gdf = filter_port_type(gdf, "port_score", PORT_THRESHOLD)
