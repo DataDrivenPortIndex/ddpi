@@ -18,17 +18,19 @@ from src.errors.env import MissingEnvironmentVariable
 load_dotenv(override=True)
 
 
-def get_enviroment_variable(table, name: str) -> str:
+def get_enviroment_variable(name: str) -> str:
     value = os.getenv(name)
 
     if value is not None and value != "" and "XXXXX" not in value:
-        table.add_row([name, value])
         return value
 
     raise MissingEnvironmentVariable(f"Enviroment variable'{name}' does not exist")
 
 
 def simplification(input_directory: str, output_directory: str):
+    if not os.path.exists(output_directory):
+        os.mkdir(output_directory)
+
     for day_file in tqdm(os.listdir(input_directory)):
         day_file_path = os.path.join(input_directory, day_file)
         ais_simplification.simplifiy(day_file_path, output_directory)
@@ -37,7 +39,7 @@ def simplification(input_directory: str, output_directory: str):
 def extraction(input_directory: str, output_directory: str, years: str):
     dfs = []
 
-    if not os.path.exists:
+    if not os.path.exists(output_directory):
         os.mkdir(output_directory)
 
     for year in years:
@@ -61,7 +63,7 @@ def extraction(input_directory: str, output_directory: str, years: str):
 
 
 def validation(input_directory: str, output_directory: str):
-    if not os.path.exists:
+    if not os.path.exists(output_directory):
         os.mkdir(output_directory)
 
     for port_event_file in tqdm(os.listdir(input_directory)):
@@ -74,22 +76,11 @@ def validation(input_directory: str, output_directory: str):
 
 
 def main():
-    table = PrettyTable(padding_width=5)
-    table.align = "l"
-    table.field_names = ["Enviroment Variable", "Value"]
+    ais_input_directory = get_enviroment_variable("AIS_INPUT_DIRECTORY")
+    ais_simplified_directory = get_enviroment_variable("AIS_SIMPLIFIED_DIRECTORY")
+    ais_port_events_directory = get_enviroment_variable("AIS_PORT_EVENTS_DIRECTORY")
+    ais_validated_port_events_directory = get_enviroment_variable("AIS_VALIDATED_PORT_EVENTS_DIRECTORY")
 
-    ais_input_directory = get_enviroment_variable(table, "AIS_INPUT_DIRECTORY")
-    ais_simplified_directory = get_enviroment_variable(
-        table, "AIS_SIMPLIFIED_DIRECTORY"
-    )
-    ais_port_events_directory = get_enviroment_variable(
-        table, "AIS_PORT_EVENTS_DIRECTORY"
-    )
-    ais_validated_port_events_directory = get_enviroment_variable(
-        table, "AIS_VALIDATED_PORT_EVENTS_DIRECTORY"
-    )
-
-    print(table)
 
     # Data-Preparation ##################################################################################
     simplification(ais_input_directory, ais_simplified_directory)
@@ -99,9 +90,8 @@ def main():
 
     validation(ais_port_events_directory, ais_validated_port_events_directory)
 
-    gdf = cluster_generation.generate(
-        "/home/pbusenius/Downloads/data/validated_port_events/validated_port_events_2020.csv"
-    )
+    # Port-Cluster generation ###########################################################################
+    gdf = cluster_generation.generate(ais_validated_port_events_directory)
 
     # DDPI-Cleaning #####################################################################################
     gdf = overlap.remove(gdf)
