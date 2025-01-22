@@ -3,7 +3,6 @@ import polars as pl
 
 from tqdm import tqdm
 from dotenv import load_dotenv
-from prettytable import PrettyTable
 
 from src.post_processing import geo_information_enrichment
 from src.post_processing import overlap
