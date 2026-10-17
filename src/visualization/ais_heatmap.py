@@ -1,7 +1,7 @@
 import os
 import glob
+import h3ronpy
 import polars as pl
-import h3ronpy.polars  # noqa: F401
 
 from dotenv import load_dotenv
 
@@ -25,18 +25,17 @@ def main():
         .agg(
             pl.col("MMSI").n_unique().alias("MMSI_COUNT"),
         )
-    ).collect(streaming=True)
+    ).collect()
 
+    # h3ronpy's polars expression namespace is not compatible with polars 2.0
     df = (
-        df.with_columns(pl.col("h3_cell_rough").h3.change_resolution(5).alias("h3"))
+        df.with_columns(
+            pl.Series(h3ronpy.change_resolution(df["h3_cell_rough"], 5)).alias("h3")
+        )
         .group_by("h3")
         .agg(pl.col("MMSI_COUNT").sum())
-        .with_columns(
-            pl.col("h3")
-            .map_elements(lambda x: f"{x:0x}", return_dtype=pl.String)
-            .alias("h3")
-        )
     )
+    df = df.with_columns(pl.Series(h3ronpy.cells_to_string(df["h3"])).alias("h3"))
 
     df.write_csv(OUTPUT_FILE)
 

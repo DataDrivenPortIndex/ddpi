@@ -1,8 +1,9 @@
 import os
+import h3ronpy
 import polars as pl
 
 from typing import Dict
-from pyo3_h3 import parallel_lat_lon_to_cell
+from h3ronpy.vector import coordinates_to_cells
 
 H3_RESOLUTION = 10
 H3_ROUGH_RESOLUTION = 6
@@ -82,8 +83,8 @@ CLASS_B_MESSAGES = {
 }
 
 
-def aggregate_ais(df: pl.DataFrame) -> pl.DataFrame:
-    return df.group_by_dynamic("TIMESTAMPUTC", by="MMSI", every="1m").agg(
+def aggregate_ais(df: pl.LazyFrame) -> pl.LazyFrame:
+    return df.group_by_dynamic("TIMESTAMPUTC", group_by="MMSI", every="1m").agg(
         pl.col("SOG").mean(),
         pl.col("COG").mean(),
         pl.col("ROT").mean(),
@@ -102,15 +103,14 @@ def aggregate_ais(df: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def class_messages(df: pl.DataFrame, mode_config: Dict) -> pl.DataFrame:
+def class_messages(df: pl.LazyFrame, mode_config: Dict) -> pl.LazyFrame:
     return (
-        df.filter(pl.col("MESSAGEID").is_in(mode_config["position"]))[
-            mode_config["position_columns"]
-        ]
+        df.filter(pl.col("MESSAGEID").is_in(mode_config["position"]))
+        .select(mode_config["position_columns"])
         .join_asof(
-            other=df.filter(pl.col("MESSAGEID") == mode_config["static"])[
+            other=df.filter(pl.col("MESSAGEID") == mode_config["static"]).select(
                 mode_config["static_columns"]
-            ],
+            ),
             on="TIMESTAMPUTC",
             by="MMSI",
             tolerance="2h",
@@ -124,47 +124,34 @@ def class_messages(df: pl.DataFrame, mode_config: Dict) -> pl.DataFrame:
 def simplifiy(day: str, output_directory: str):
     out_path = f"{os.path.join(output_directory, os.path.basename(day))}.parquet"
     if not os.path.isfile(out_path):
-        df = pl.read_parquet(f"{day}/*type_cast.parquet", columns=AIS_COLUMNS)
+        lf = pl.scan_parquet(f"{day}/*type_cast.parquet").select(AIS_COLUMNS)
 
         # filter and combine class a and class b messages
-        class_a_df = class_messages(df, CLASS_A_MESSAGES)
-        class_b_df = class_messages(df, CLASS_B_MESSAGES)
+        class_a_lf = class_messages(lf, CLASS_A_MESSAGES)
+        class_b_lf = class_messages(lf, CLASS_B_MESSAGES)
 
-        df = pl.concat([class_a_df, class_b_df]).sort("TIMESTAMPUTC")
-
-        df = aggregate_ais(df)
-
-        df = df.filter(
-            (~pl.col("LATITUDE").is_infinite()) & (~pl.col("LONGITUDE").is_infinite())
-        )
+        lf = pl.concat([class_a_lf, class_b_lf]).sort("TIMESTAMPUTC")
 
         # TODO: remove type conversion and handle this in rust
-        df = df.with_columns(
-            [
+        df = (
+            aggregate_ais(lf)
+            .filter(
+                (~pl.col("LATITUDE").is_infinite())
+                & (~pl.col("LONGITUDE").is_infinite())
+            )
+            .with_columns(
                 pl.col("LONGITUDE").cast(pl.Float64),
                 pl.col("LATITUDE").cast(pl.Float64),
-            ]
+            )
+            .collect()
         )
 
-        # add h3 cells
-        df_h3_cell = parallel_lat_lon_to_cell(
-            df.select(["LONGITUDE", "LATITUDE"]),
-            "LATITUDE",
-            "LONGITUDE",
-            H3_RESOLUTION,
-            "h3_cell",
-        )
-        df_h3_cell = df_h3_cell.drop(["LONGITUDE", "LATITUDE"])
+        # add h3 cells, the rough cell is derived from the fine cell instead of the coordinates
+        h3_cell = pl.Series(
+            coordinates_to_cells(df["LATITUDE"], df["LONGITUDE"], H3_RESOLUTION)
+        ).alias("h3_cell")
+        h3_cell_rough = pl.Series(
+            h3ronpy.change_resolution(h3_cell, H3_ROUGH_RESOLUTION)
+        ).alias("h3_cell_rough")
 
-        df_h3_cell_rough = parallel_lat_lon_to_cell(
-            df.select(["LONGITUDE", "LATITUDE"]),
-            "LATITUDE",
-            "LONGITUDE",
-            H3_ROUGH_RESOLUTION,
-            "h3_cell_rough",
-        )
-        df_h3_cell_rough = df_h3_cell_rough.drop(["LONGITUDE", "LATITUDE"])
-
-        df = pl.concat([df, df_h3_cell, df_h3_cell_rough], how="horizontal")
-
-        df.write_parquet(out_path)
+        df.with_columns(h3_cell, h3_cell_rough).write_parquet(out_path)

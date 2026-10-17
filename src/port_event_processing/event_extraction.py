@@ -16,8 +16,12 @@ YEARS_TO_PROCESS = [2020, 2021, 2022]
 NAV_STATUS_CODES = {"moored": 5, "anchored": 1}
 
 
+def as_flag(condition: pl.Expr, dtype=pl.UInt8) -> pl.Expr:
+    return condition.fill_null(False).cast(dtype)
+
+
 def process_day(day_file: str) -> pl.LazyFrame:
-    df_lazy = (
+    return (
         pl.scan_parquet(day_file)
         .with_columns(
             pl.col("NAVSTATUSCODE").cast(pl.Int64),
@@ -28,7 +32,7 @@ def process_day(day_file: str) -> pl.LazyFrame:
             "TIMESTAMPUTC",
             every=DYNAMIC_GROUPBY_EVERY,
             period=DYNAMIC_GROUPBY_PERIOD,
-            by="MMSI",
+            group_by="MMSI",
         )
         .agg(
             pl.col("LATITUDE").first(),
@@ -37,9 +41,16 @@ def process_day(day_file: str) -> pl.LazyFrame:
             pl.col("h3_cell").first(),
             pl.col("SHIPANDCARGOTYPECODE").first(),
             pl.col("TIMESTAMPUTC").last().alias("last_timestamp"),
-            pl.col("MAXDRAUGHT").unique(),
-            pl.col("DESTINATION").unique(),
-            pl.col("NAVSTATUSCODE").unique(),
+            pl.col("MAXDRAUGHT").n_unique().alias("number_of_draughts"),
+            pl.col("DESTINATION").n_unique().alias("number_of_destinations"),
+            pl.col("NAVSTATUSCODE")
+            .eq(NAV_STATUS_CODES["moored"])
+            .any()
+            .alias("is_moored_event"),
+            pl.col("NAVSTATUSCODE")
+            .eq(NAV_STATUS_CODES["anchored"])
+            .any()
+            .alias("is_anchored_event"),
             pl.col("MMSI").count().alias("number_of_messages"),
             pl.col("h3_cell").n_unique().alias("number_of_h3_cells"),
             (pl.col("COG").quantile(0.25).sub(pl.col("COG").quantile(0.75)))
@@ -53,86 +64,48 @@ def process_day(day_file: str) -> pl.LazyFrame:
             .alias("rate_of_turn_iqr"),
         )
         .filter(pl.col("number_of_messages") >= MINIMUN_NUMBER_OF_MESSAGES)
-        .with_columns(
-            pl.col("NAVSTATUSCODE")
-            .list.contains(NAV_STATUS_CODES["moored"])
-            .alias("is_moored_event"),
-            pl.col("NAVSTATUSCODE")
-            .list.contains(NAV_STATUS_CODES["anchored"])
-            .alias("is_anchored_event"),
-        )
         .filter(
             (pl.col("is_moored_event"))
             | (pl.col("is_anchored_event"))
             | (pl.col("SOG") <= SPEED_OVER_GROUND_THRESHOLD)
             | (pl.col("number_of_h3_cells") == NUMBER_OF_H3_CELLS_THRESHOLD)
-            | (pl.col("MAXDRAUGHT").len() >= DRAUGHT_COUNT_THRESHOLD)
+            | (pl.col("number_of_draughts") >= DRAUGHT_COUNT_THRESHOLD)
             | (pl.col("drift_iqr") >= DRIFT_THRESHOLD)
             | (pl.col("cog_iqr") <= COG_IQR_THRESHOLD)
             | (pl.col("rate_of_turn_iqr") <= RATE_OF_TURN_THRESHOLD)
-            | (pl.col("DESTINATION").len() >= DESTINATION_COUNT_THRESHOLD)
+            | (pl.col("number_of_destinations") >= DESTINATION_COUNT_THRESHOLD)
         )
         .with_columns(
-            pl.when(pl.col("SOG") <= SPEED_OVER_GROUND_THRESHOLD)
-            .then(True)
-            .otherwise(False)
-            .cast(pl.Boolean)
-            .alias("no_sog_event"),
-            pl.when(pl.col("number_of_h3_cells") == 1)
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("no_movement_event"),
-            pl.when(pl.col("drift_iqr") >= DRIFT_THRESHOLD)
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("drifting_event"),
-            pl.when(pl.col("rate_of_turn_iqr") <= RATE_OF_TURN_THRESHOLD)
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("no_rate_of_turn_event"),
-            pl.when(pl.col("DESTINATION").len() >= 2)
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("destination_changed_event"),
-            pl.when(pl.col("MAXDRAUGHT").len() >= 2)
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("draught_changed_event"),
-            pl.when(pl.col("SHIPANDCARGOTYPECODE").is_in(TOWING_VESSEL_TYPES))
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("towing_event"),
-            pl.when(pl.col("is_moored_event"))
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("is_moored_event"),
-            pl.when(pl.col("is_anchored_event"))
-            .then(True)
-            .otherwise(False)
-            .cast(pl.UInt8)
-            .alias("is_anchored_event"),
+            as_flag(pl.col("SOG") <= SPEED_OVER_GROUND_THRESHOLD, pl.Boolean).alias(
+                "no_sog_event"
+            ),
+            as_flag(pl.col("number_of_h3_cells") == 1).alias("no_movement_event"),
+            as_flag(pl.col("drift_iqr") >= DRIFT_THRESHOLD).alias("drifting_event"),
+            as_flag(pl.col("rate_of_turn_iqr") <= RATE_OF_TURN_THRESHOLD).alias(
+                "no_rate_of_turn_event"
+            ),
+            as_flag(
+                pl.col("number_of_destinations") >= DESTINATION_COUNT_THRESHOLD
+            ).alias("destination_changed_event"),
+            as_flag(pl.col("number_of_draughts") >= DRAUGHT_COUNT_THRESHOLD).alias(
+                "draught_changed_event"
+            ),
+            as_flag(pl.col("SHIPANDCARGOTYPECODE").is_in(TOWING_VESSEL_TYPES)).alias(
+                "towing_event"
+            ),
+            as_flag(pl.col("is_moored_event")).alias("is_moored_event"),
+            as_flag(pl.col("is_anchored_event")).alias("is_anchored_event"),
         )
         .drop(
             [
-                "NAVSTATUSCODE",
                 "SHIPANDCARGOTYPECODE",
-                "DESTINATION",
-                "MAXDRAUGHT",
+                "number_of_destinations",
+                "number_of_draughts",
                 "number_of_messages",
                 "SOG",
                 "number_of_h3_cells",
                 "drift_iqr",
                 "rate_of_turn_iqr",
-                "MAXDRAUGHT",
             ]
         )
     )
-
-    return df_lazy.collect()

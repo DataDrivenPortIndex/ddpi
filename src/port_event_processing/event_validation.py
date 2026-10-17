@@ -4,7 +4,6 @@ MIN_DAYS = 10
 EVENT_THRESHOLD = 0.35
 PORT_THRESHOLD = 0.7
 ANCHORAGE_THRESHOLD = 0.7
-MICROSECONDS_IN_DAY = 864000
 MIN_NUMBER_OF_VESSELS = 2
 NO_SOG_EVENT_THRESHOLD = 0
 NO_MOVEMENT_EVENT_THRESHOLD = 0
@@ -41,7 +40,7 @@ def validate(port_events_input_file: str, port_events_output_file: str):
         )
         & (
             pl.col("last_timestamp") - pl.col("first_timestamp")
-            >= MICROSECONDS_IN_DAY * MIN_DAYS
+            >= pl.duration(days=MIN_DAYS)
         )
     ).with_columns(
         (
@@ -62,14 +61,16 @@ def validate(port_events_input_file: str, port_events_output_file: str):
             "anchorage_score"
         ),
     ).with_columns(
-        (pl.col("event_score") - pl.col("event_score").min())
-        / (pl.col("event_score").max() - pl.col("event_score").min()).alias(
-            "event_score"
-        ),
-        (pl.col("port_score") - pl.col("port_score").min())
-        / (pl.col("port_score").max() - pl.col("port_score").min()).alias("port_score"),
-        (pl.col("anchorage_score") - pl.col("anchorage_score").min())
-        / (pl.col("anchorage_score").max() - pl.col("anchorage_score").min()).alias(
-            "port_score"
-        ),
-    ).collect(streaming=True).write_csv(port_events_output_file)
+        (
+            (pl.col("event_score") - pl.col("event_score").min())
+            / (pl.col("event_score").max() - pl.col("event_score").min())
+        ).alias("event_score"),
+        (
+            (pl.col("port_score") - pl.col("port_score").min())
+            / (pl.col("port_score").max() - pl.col("port_score").min())
+        ).alias("port_score"),
+        (
+            (pl.col("anchorage_score") - pl.col("anchorage_score").min())
+            / (pl.col("anchorage_score").max() - pl.col("anchorage_score").min())
+        ).alias("anchorage_score"),
+    ).sink_csv(port_events_output_file)

@@ -35,30 +35,30 @@ def simplification(input_directory: str, output_directory: str):
         ais_simplification.simplifiy(day_file_path, output_directory)
 
 
-def extraction(input_directory: str, output_directory: str, years: str):
-    dfs = []
-
+def extraction(input_directory: str, output_directory: str, years: list[str]):
     if not os.path.exists(output_directory):
         os.mkdir(output_directory)
 
     for year in years:
         output_file = os.path.join(output_directory, f"port_events_{year}.parquet")
+        if os.path.isfile(output_file):
+            continue
+
+        lazy_frames = []
         for day_file in tqdm(os.listdir(input_directory)):
             if year in day_file:
-                if os.path.isfile(output_file):
-                    continue
+                day_file_path = os.path.join(input_directory, day_file)
+                df_lazy = event_extraction.process_day(day_file_path)
                 try:
-                    day_file_path = os.path.join(input_directory, day_file)
-
-                    df_lazy = event_extraction.process_day(day_file_path)
-
-                    dfs.append(df_lazy)
-                except pl.exceptions.ComputeError:
+                    # resolves the schema to skip unreadable day files before the query runs
+                    df_lazy.collect_schema()
+                except pl.exceptions.PolarsError:
                     print(day_file)
-                    pass
+                    continue
 
-        if not os.path.isfile(output_file):
-            pl.concat(dfs).write_parquet(output_file)
+                lazy_frames.append(df_lazy)
+
+        pl.concat(lazy_frames).sink_parquet(output_file)
 
 
 def validation(input_directory: str, output_directory: str):
